@@ -59,5 +59,6 @@ src/app/layout.tsx   — общий каркас всех страниц (язы
 src/app/page.tsx     — главная страница
 src/app/globals.css  — стили, светлая и тёмная тема
 next.config.ts       — настройки Next.js
+docs/                — техническое задание (ТЗ) платформы и станций
 CLAUDE.md            — правила проекта для Claude
 ```
