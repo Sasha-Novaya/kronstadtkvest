@@ -1,0 +1,64 @@
+/* Цвета светлой темы */
+:root {
+  color-scheme: light dark;
+  --background: #f4f7fb;
+  --foreground: #0f2236;
+  --muted: #3d5670;
+}
+
+/* Цвета тёмной темы — включаются по настройкам телефона */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0b1622;
+    --foreground: #eef4fa;
+    --muted: #a9bdd1;
+  }
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body {
+  min-height: 100%;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family:
+    system-ui,
+    -apple-system,
+    "Segoe UI",
+    Roboto,
+    Arial,
+    sans-serif;
+  -webkit-text-size-adjust: 100%;
+}
+
+.home {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 1.25rem;
+  max-width: 40rem;
+  margin: 0 auto;
+  padding: 2rem 1.25rem;
+  text-align: center;
+}
+
+.title {
+  font-size: clamp(2.5rem, 11vw, 4rem);
+  line-height: 1.1;
+  font-weight: 800;
+}
+
+.subtitle {
+  font-size: clamp(1.125rem, 4.8vw, 1.375rem);
+  line-height: 1.5;
+  color: var(--muted);
+}
