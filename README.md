@@ -10,7 +10,7 @@
 
 - [Next.js](https://nextjs.org) (App Router) + TypeScript
 - Node.js 22
-- Хостинг: Timeweb Cloud (App Platform), сборка `output: "standalone"`
+- Хостинг: Timeweb Cloud (App Platform), Next.js с SSR: `npm run build` + `npm start`
 - Позже: база данных PostgreSQL и S3-хранилище для файлов (тоже в Timeweb Cloud)
 
 ## Как запустить на своём компьютере
@@ -33,18 +33,16 @@
 
 ## Сборка для хостинга
 
+Timeweb Cloud App Platform делает то же самое, что и эти команды:
+
 ```bash
+npm install
 npm run build
+npm start
 ```
 
-После сборки появится папка `.next/standalone` с готовым сервером.
-Чтобы запустить его так же, как на хостинге:
-
-```bash
-cp -r public .next/standalone/
-cp -r .next/static .next/standalone/.next/
-node .next/standalone/server.js
-```
+`npm start` запускает сервер Next.js (`next start`) с включённым SSR.
+Порт берётся из переменной окружения `PORT`, по умолчанию — 3000.
 
 ## Секреты
 

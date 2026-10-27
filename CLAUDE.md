@@ -51,7 +51,9 @@
 ## Технологии и инфраструктура
 
 - Фреймворк: Next.js (App Router, TypeScript), Node.js 22.
-- Хостинг: Timeweb Cloud (App Platform). Сборка в режиме `output: "standalone"`.
+- Хостинг: Timeweb Cloud (App Platform), Next.js с включённым SSR.
+  Хостинг собирает и запускает так: `npm install` → `npm run build` → `npm start`
+  (`next start`, порт из переменной окружения `PORT`). `output: "standalone"` не используем.
 - База данных: PostgreSQL (в Timeweb Cloud).
 - Файлы (аудио, картинки): S3-хранилище (в Timeweb Cloud).
 - Vercel и Supabase НЕ используем.
