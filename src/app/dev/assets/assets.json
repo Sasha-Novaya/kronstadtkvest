@@ -7,7 +7,7 @@
     "kind": "hero",
     "width": 700,
     "height": 710,
-    "kb": 57
+    "kb": 66
   },
   {
     "file": "fedot-1-gazeta.webp",
@@ -16,8 +16,8 @@
     "source": "Ф1 рассказчик.png",
     "kind": "hero",
     "width": 700,
-    "height": 879,
-    "kb": 69
+    "height": 878,
+    "kb": 80
   },
   {
     "file": "fedot-2.webp",
@@ -27,7 +27,7 @@
     "kind": "hero",
     "width": 700,
     "height": 739,
-    "kb": 58
+    "kb": 65
   },
   {
     "file": "fedot-3.webp",
@@ -36,8 +36,8 @@
     "source": "Ф3 ностальгия.png",
     "kind": "hero",
     "width": 700,
-    "height": 926,
-    "kb": 70
+    "height": 924,
+    "kb": 79
   },
   {
     "file": "fedot-3-serious.webp",
@@ -46,8 +46,8 @@
     "source": "Ф3 серьезный.png",
     "kind": "hero",
     "width": 700,
-    "height": 822,
-    "kb": 63
+    "height": 821,
+    "kb": 74
   },
   {
     "file": "fedot-4.webp",
@@ -57,7 +57,7 @@
     "kind": "hero",
     "width": 700,
     "height": 705,
-    "kb": 64
+    "kb": 74
   },
   {
     "file": "klusha-1.webp",
@@ -66,8 +66,8 @@
     "source": "К1 веселая.png",
     "kind": "hero",
     "width": 700,
-    "height": 703,
-    "kb": 55
+    "height": 699,
+    "kb": 59
   },
   {
     "file": "klusha-1-dreamy.webp",
@@ -77,7 +77,7 @@
     "kind": "hero",
     "width": 700,
     "height": 1056,
-    "kb": 75
+    "kb": 87
   },
   {
     "file": "klusha-2.webp",
@@ -85,9 +85,9 @@
     "id": "K2",
     "source": "К2 виноватая.png",
     "kind": "hero",
-    "width": 663,
-    "height": 1234,
-    "kb": 70
+    "width": 665,
+    "height": 1239,
+    "kb": 92
   },
   {
     "file": "klusha-3.webp",
@@ -96,8 +96,8 @@
     "source": "К3 подсказка.png",
     "kind": "hero",
     "width": 700,
-    "height": 799,
-    "kb": 67
+    "height": 795,
+    "kb": 72
   },
   {
     "file": "klusha-4.webp",
@@ -106,8 +106,8 @@
     "source": "К4 правда или легенда.png",
     "kind": "hero",
     "width": 700,
-    "height": 877,
-    "kb": 75
+    "height": 878,
+    "kb": 82
   },
   {
     "file": "klusha-5-pie.webp",
@@ -116,8 +116,8 @@
     "source": "К5 пирожок.png",
     "kind": "hero",
     "width": 700,
-    "height": 958,
-    "kb": 78
+    "height": 954,
+    "kb": 89
   },
   {
     "file": "klusha-5-camera.webp",
@@ -126,8 +126,8 @@
     "source": "К5 фотоаппарат.png",
     "kind": "hero",
     "width": 700,
-    "height": 952,
-    "kb": 78
+    "height": 955,
+    "kb": 86
   },
   {
     "file": "klusha-5-album.webp",
@@ -136,8 +136,8 @@
     "source": "К5 записки.png",
     "kind": "hero",
     "width": 700,
-    "height": 945,
-    "kb": 71
+    "height": 941,
+    "kb": 83
   },
   {
     "file": "klusha-6.webp",
@@ -146,8 +146,8 @@
     "source": "К6 указка.png",
     "kind": "hero",
     "width": 700,
-    "height": 723,
-    "kb": 56
+    "height": 724,
+    "kb": 62
   },
   {
     "file": "journal-1.webp",

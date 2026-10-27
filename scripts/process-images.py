@@ -26,7 +26,7 @@ import sys
 from pathlib import Path
 
 import numpy as np
-from PIL import Image, ImageFilter
+from PIL import Image
 
 ROOT = Path(__file__).resolve().parent.parent
 SRC_DIR = ROOT / "assets-src/kronstadt-walk/images"
@@ -85,23 +85,32 @@ _session = None
 
 
 def cut_out(img: Image.Image) -> Image.Image:
-    """Вырезает героя: нейросеть находит фигуру, а цветные детали (ленты, гюйс)
-    дополнительно сохраняются по насыщенности цвета, чтобы их не съело."""
+    """Вырезает героя с белого фона нейросетью BiRefNet (точнее всего держит
+    белые бескозырки, волосы и перья) и убирает белую кайму по краю."""
     global _session
     from rembg import new_session, remove
 
     if _session is None:
-        _session = new_session("isnet-general-use")
+        _session = new_session("birefnet-general-lite")
     rgb = img.convert("RGB")
-    ai_alpha = np.asarray(remove(rgb, session=_session, post_process_mask=True))[..., 3]
-    px = np.asarray(rgb).astype(int)
-    colored = (px.max(axis=2) - px.min(axis=2)) > 45
-    alpha = np.maximum(ai_alpha, np.where(colored, 255, 0)).astype(np.uint8)
-    # Мягкий край в 1 px, чтобы не было «лесенки».
-    alpha_img = Image.fromarray(alpha).filter(ImageFilter.GaussianBlur(0.6))
-    out = rgb.convert("RGBA")
-    out.putalpha(alpha_img)
-    box = Image.fromarray((alpha > 8).astype(np.uint8) * 255).getbbox()
+    alpha = np.asarray(remove(rgb, session=_session))[..., 3].astype(np.float32) / 255
+    # Яркие цветные мелочи (лучики лампочки, крошки) нейросеть иногда теряет.
+    # Фон белый, поэтому всё заметно цветное точно относится к картинке.
+    px = np.asarray(rgb).astype(np.int16)
+    colored = (px.max(axis=2) - px.min(axis=2)) > 60
+    alpha = np.maximum(alpha, colored.astype(np.float32))
+    # Убираем остатки белого фона: полупрозрачные пиксели края «смешаны» с белым,
+    # вычитаем белую часть и оставляем только цвет героя.
+    color = np.asarray(rgb).astype(np.float32)
+    a = np.clip(alpha, 1e-3, 1)[..., None]
+    clean = np.clip((color - (1 - a) * 255) / a, 0, 255)
+    edge = (alpha > 0.02) & (alpha < 0.98)
+    color[edge] = clean[edge]
+    alpha[alpha < 0.03] = 0
+    out = Image.fromarray(
+        np.dstack([color, alpha * 255]).round().astype(np.uint8), "RGBA"
+    )
+    box = Image.fromarray((alpha > 0.03).astype(np.uint8) * 255).getbbox()
     return out.crop(box) if box else out
 
 
