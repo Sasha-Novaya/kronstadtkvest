@@ -1,17 +1,23 @@
-/* Цвета светлой темы */
+/* Цвета светлой темы («туман, день») */
 :root {
   color-scheme: light dark;
-  --background: #f4f7fb;
-  --foreground: #0f2236;
-  --muted: #3d5670;
+  --background: #e6ebf0;
+  --background-image: url("/images/fog-light.webp");
+  --title: #1b2f55;
+  --text: #34465f;
+  --badge: #6a5330;
+  --title-glow: rgba(255, 255, 255, 0.9);
 }
 
-/* Цвета тёмной темы — включаются по настройкам телефона */
+/* Цвета тёмной темы («туман, ночь») — включаются по настройкам телефона */
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0b1622;
-    --foreground: #eef4fa;
-    --muted: #a9bdd1;
+    --background: #0c1a30;
+    --background-image: url("/images/fog-dark.webp");
+    --title: #e7b45c;
+    --text: #c9d6ea;
+    --badge: #d9a85a;
+    --title-glow: rgba(0, 0, 0, 0.55);
   }
 }
 
@@ -27,8 +33,8 @@ body {
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
+  background: var(--background) var(--background-image) center / cover fixed;
+  color: var(--text);
   font-family:
     system-ui,
     -apple-system,
@@ -43,22 +49,61 @@ body {
   min-height: 100dvh;
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  gap: 1.25rem;
-  max-width: 40rem;
+  max-width: 34rem;
   margin: 0 auto;
-  padding: 2rem 1.25rem;
+  overflow: hidden;
   text-align: center;
 }
 
+/* Текст занимает верхнюю часть экрана и стоит посередине неё */
+.intro {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 1.25rem;
+  padding: 2.5rem 1.25rem 1rem;
+}
+
+.badge {
+  font-size: 0.8rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--badge);
+}
+
 .title {
-  font-size: clamp(2.5rem, 11vw, 4rem);
-  line-height: 1.1;
+  font-family: Georgia, "PT Serif", "Times New Roman", serif;
+  font-size: clamp(3rem, 14vw, 4.5rem);
+  line-height: 1.05;
   font-weight: 800;
+  color: var(--title);
+  text-shadow: 0 2px 14px var(--title-glow);
 }
 
 .subtitle {
-  font-size: clamp(1.125rem, 4.8vw, 1.375rem);
-  line-height: 1.5;
-  color: var(--muted);
+  font-size: clamp(1.25rem, 5.6vw, 1.6rem);
+  line-height: 1.45;
+}
+
+/* Герои стоят внизу экрана: Федот прижат к левому краю, Клуша — к правому */
+.heroes {
+  position: relative;
+  height: min(48dvh, 30rem);
+}
+
+.hero {
+  position: absolute;
+  bottom: 0;
+  width: auto;
+}
+
+.hero-fedot {
+  left: -4%;
+  height: 100%;
+}
+
+.hero-klusha {
+  right: 0;
+  height: 62%;
 }

@@ -58,6 +58,7 @@ node .next/standalone/server.js
 src/app/layout.tsx   — общий каркас всех страниц (язык, тема)
 src/app/page.tsx     — главная страница
 src/app/globals.css  — стили, светлая и тёмная тема
+public/images/       — картинки: герои и туманный фон
 next.config.ts       — настройки Next.js
 CLAUDE.md            — правила проекта для Claude
 ```
