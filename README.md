@@ -44,6 +44,20 @@ npm start
 `npm start` запускает сервер Next.js (`next start`) с включённым SSR.
 Порт берётся из переменной окружения `PORT`, по умолчанию — 3000.
 
+## Картинки квеста
+
+Оригиналы лежат в `assets-src/kronstadt-walk/images/` (их не меняем).
+Готовые WebP для сайта делает скрипт — одной командой (нужен Python 3):
+
+```bash
+pip install -r scripts/requirements.txt
+python3 scripts/process-images.py
+```
+
+Скрипт кладёт картинки в `public/quests/kronstadt-walk/images/` и обновляет таблицу
+в `docs/assets-kronstadt-walk.md`. Чтобы добавить новую картинку, допишите её
+в список `IMAGES` в начале скрипта.
+
 ## Секреты
 
 Пароли и ключи хранятся только в переменных окружения: локально — в файле

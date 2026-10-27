@@ -1,0 +1,322 @@
+[
+  {
+    "file": "fedot-1.webp",
+    "code": "Ф1",
+    "id": "F1",
+    "source": "Ф5 важно интересно.png",
+    "kind": "hero",
+    "width": 700,
+    "height": 710,
+    "kb": 57
+  },
+  {
+    "file": "fedot-1-gazeta.webp",
+    "code": "Ф1г",
+    "id": "F1-gazeta",
+    "source": "Ф1 рассказчик.png",
+    "kind": "hero",
+    "width": 700,
+    "height": 879,
+    "kb": 69
+  },
+  {
+    "file": "fedot-2.webp",
+    "code": "Ф2",
+    "id": "F2",
+    "source": "Ф2 ворчит.png",
+    "kind": "hero",
+    "width": 700,
+    "height": 739,
+    "kb": 58
+  },
+  {
+    "file": "fedot-3.webp",
+    "code": "Ф3",
+    "id": "F3",
+    "source": "Ф3 ностальгия.png",
+    "kind": "hero",
+    "width": 700,
+    "height": 926,
+    "kb": 70
+  },
+  {
+    "file": "fedot-3-serious.webp",
+    "code": "Ф3-серьёзный",
+    "id": "F3-serious",
+    "source": "Ф3 серьезный.png",
+    "kind": "hero",
+    "width": 700,
+    "height": 822,
+    "kb": 63
+  },
+  {
+    "file": "fedot-4.webp",
+    "code": "Ф4",
+    "id": "F4",
+    "source": "Ф4 страница.png",
+    "kind": "hero",
+    "width": 700,
+    "height": 705,
+    "kb": 64
+  },
+  {
+    "file": "klusha-1.webp",
+    "code": "К1",
+    "id": "K1",
+    "source": "К1 веселая.png",
+    "kind": "hero",
+    "width": 700,
+    "height": 703,
+    "kb": 55
+  },
+  {
+    "file": "klusha-1-dreamy.webp",
+    "code": "К1-мечтательная",
+    "id": "K1-dreamy",
+    "source": "К1 мечтательная.png",
+    "kind": "hero",
+    "width": 700,
+    "height": 1056,
+    "kb": 75
+  },
+  {
+    "file": "klusha-2.webp",
+    "code": "К2",
+    "id": "K2",
+    "source": "К2 виноватая.png",
+    "kind": "hero",
+    "width": 663,
+    "height": 1234,
+    "kb": 70
+  },
+  {
+    "file": "klusha-3.webp",
+    "code": "К3",
+    "id": "K3",
+    "source": "К3 подсказка.png",
+    "kind": "hero",
+    "width": 700,
+    "height": 799,
+    "kb": 67
+  },
+  {
+    "file": "klusha-4.webp",
+    "code": "К4",
+    "id": "K4",
+    "source": "К4 правда или легенда.png",
+    "kind": "hero",
+    "width": 700,
+    "height": 877,
+    "kb": 75
+  },
+  {
+    "file": "klusha-5-pie.webp",
+    "code": "К5-пирожок",
+    "id": "K5-pie",
+    "source": "К5 пирожок.png",
+    "kind": "hero",
+    "width": 700,
+    "height": 958,
+    "kb": 78
+  },
+  {
+    "file": "klusha-5-camera.webp",
+    "code": "К5-фотоаппарат",
+    "id": "K5-camera",
+    "source": "К5 фотоаппарат.png",
+    "kind": "hero",
+    "width": 700,
+    "height": 952,
+    "kb": 78
+  },
+  {
+    "file": "klusha-5-album.webp",
+    "code": "К5-альбом",
+    "id": "K5-album",
+    "source": "К5 записки.png",
+    "kind": "hero",
+    "width": 700,
+    "height": 945,
+    "kb": 71
+  },
+  {
+    "file": "klusha-6.webp",
+    "code": "К6",
+    "id": "K6",
+    "source": "К6 указка.png",
+    "kind": "hero",
+    "width": 700,
+    "height": 723,
+    "kb": 56
+  },
+  {
+    "file": "journal-1.webp",
+    "code": "Ж1",
+    "id": "J1",
+    "source": "Ж1.png",
+    "kind": "flat",
+    "width": 1200,
+    "height": 1200,
+    "kb": 203
+  },
+  {
+    "file": "journal-2.webp",
+    "code": "Ж2",
+    "id": "J2",
+    "source": "Ж2 страница.png",
+    "kind": "flat",
+    "width": 941,
+    "height": 1672,
+    "kb": 100
+  },
+  {
+    "file": "journal-3.webp",
+    "code": "Ж3",
+    "id": "J3",
+    "source": "Ж3 прогресс.png",
+    "kind": "flat",
+    "width": 1200,
+    "height": 1200,
+    "kb": 62
+  },
+  {
+    "file": "gramota.webp",
+    "code": "ГР",
+    "id": "GR",
+    "source": "ГР грамота.png",
+    "kind": "flat",
+    "width": 1086,
+    "height": 1448,
+    "kb": 117
+  },
+  {
+    "file": "ill-klusha-svertok.webp",
+    "code": "—",
+    "id": "ill-klusha-svertok",
+    "source": "завязка.png",
+    "kind": "flat",
+    "width": 1200,
+    "height": 900,
+    "kb": 172
+  },
+  {
+    "file": "ill-zaliv-shema.webp",
+    "code": "—",
+    "id": "ill-zaliv-shema",
+    "source": "ст 1 схема.png",
+    "kind": "flat",
+    "width": 1200,
+    "height": 675,
+    "kb": 165
+  },
+  {
+    "file": "ill-srub-v-prorubi.webp",
+    "code": "—",
+    "id": "ill-srub-v-prorubi",
+    "source": "ст 1 кроншлот.png",
+    "kind": "flat",
+    "width": 1200,
+    "height": 900,
+    "kb": 197
+  },
+  {
+    "file": "foto-yakor-sverhu.webp",
+    "code": "—",
+    "id": "foto-yakor-sverhu",
+    "source": "Ст4_якорь_сверху.jpg",
+    "kind": "flat",
+    "width": 1200,
+    "height": 799,
+    "kb": 139
+  },
+  {
+    "file": "ill-hram-sverhu.webp",
+    "code": "—",
+    "id": "ill-hram-sverhu",
+    "source": "ст 5 восход-запад.png",
+    "kind": "flat",
+    "width": 1200,
+    "height": 900,
+    "kb": 248
+  },
+  {
+    "file": "ill-krestovina.webp",
+    "code": "—",
+    "id": "ill-krestovina",
+    "source": "Ст12а_схема_крестовины.png",
+    "kind": "flat",
+    "width": 1200,
+    "height": 884,
+    "kb": 69
+  },
+  {
+    "file": "foto-dok-vnutri.webp",
+    "code": "—",
+    "id": "foto-dok-vnutri",
+    "source": "Ст15_Петровский_док_внутри.jpg",
+    "kind": "flat",
+    "width": 1200,
+    "height": 900,
+    "kb": 227
+  },
+  {
+    "file": "ill-katok.webp",
+    "code": "—",
+    "id": "ill-katok",
+    "source": "Ст16_Каток_на_Итальянском_пруду_Крестьянинов.png",
+    "kind": "flat",
+    "width": 1200,
+    "height": 498,
+    "kb": 58
+  },
+  {
+    "file": "ill-oranienbaum.webp",
+    "code": "—",
+    "id": "ill-oranienbaum",
+    "source": "Ст17_гравюра_Проспект_Ораниенбаума.png",
+    "kind": "flat",
+    "width": 1200,
+    "height": 467,
+    "kb": 96
+  },
+  {
+    "file": "ill-navodnenie-1824.webp",
+    "code": "—",
+    "id": "ill-navodnenie-1824",
+    "source": "ст 18 наводнение.png",
+    "kind": "flat",
+    "width": 1200,
+    "height": 900,
+    "kb": 219
+  },
+  {
+    "file": "ill-futshtok-shema.webp",
+    "code": "—",
+    "id": "ill-futshtok-shema",
+    "source": "Ст19_схема_футштока.png",
+    "kind": "flat",
+    "width": 1000,
+    "height": 1032,
+    "kb": 65
+  },
+  {
+    "file": "fedot-reference.webp",
+    "code": "запас",
+    "id": "—",
+    "source": "Капитан референс.png",
+    "kind": "flat",
+    "width": 1200,
+    "height": 900,
+    "kb": 59
+  },
+  {
+    "file": "klusha-reference.webp",
+    "code": "запас",
+    "id": "—",
+    "source": "чайка референс.png",
+    "kind": "flat",
+    "width": 1200,
+    "height": 800,
+    "kb": 77
+  }
+]

@@ -1,0 +1,6 @@
+# Библиотеки Python для scripts/process-images.py (нужны только для обработки картинок,
+# в само приложение не попадают).
+# Установка: pip install -r scripts/requirements.txt
+Pillow>=10
+numpy>=1.26
+rembg[cpu]>=2.0.60
