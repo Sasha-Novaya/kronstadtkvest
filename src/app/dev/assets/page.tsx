@@ -1,7 +1,7 @@
 // Временная служебная страница: просмотр готовых картинок квеста. Потом удалим.
 import type { Metadata } from "next";
 import Image from "next/image";
-import assets from "./assets.json";
+import assets from "@/quests/kronstadt-walk/images.json";
 import styles from "./assets.module.css";
 
 export const metadata: Metadata = {

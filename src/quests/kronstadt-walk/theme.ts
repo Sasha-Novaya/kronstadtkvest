@@ -49,7 +49,13 @@ export const kronstadtWalkTheme: QuestTheme = {
     shadow: "0 8px 22px rgba(20, 88, 184, 0.14)",
   },
   heroes: {
-    fedot: { name: "Капитан Федот Селёдкин", color: navy },
-    klusha: { name: "Клуша", color: "#543e34" },
+    // Федот — слева над карточкой реплики (макет 4).
+    fedot: { name: "Капитан Селёдкин", color: navy, side: "left", defaultImage: "F1" },
+    // Клуша — справа: в карточке (макет 5) или на верхней рамке (макет 6).
+    klusha: { name: "Клуша", color: "#543e34", side: "right", defaultImage: "K1" },
+  },
+  lines: {
+    // Реплика длиннее этого числа символов считается длинной: Клуша встаёт на рамку (макет 6).
+    longTextChars: 90,
   },
 };

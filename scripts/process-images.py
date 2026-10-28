@@ -8,7 +8,7 @@
   ширина до 1200 px, качество ~75, до ~250 КБ.
 
 Ещё обновляет:
-- src/app/dev/assets/assets.json — список для служебной страницы /dev/assets;
+- src/quests/kronstadt-walk/images.json — список готовых картинок (размеры, коды);
 - таблицу «Готовые файлы» в docs/assets-kronstadt-walk.md.
 
 Запуск из корня проекта:
@@ -31,7 +31,7 @@ from PIL import Image
 ROOT = Path(__file__).resolve().parent.parent
 SRC_DIR = ROOT / "assets-src/kronstadt-walk/images"
 OUT_DIR = ROOT / "public/quests/kronstadt-walk/images"
-MANIFEST = ROOT / "src/app/dev/assets/assets.json"
+MANIFEST = ROOT / "src/quests/kronstadt-walk/images.json"
 DOC = ROOT / "docs/assets-kronstadt-walk.md"
 DOC_START = "<!-- готовые-файлы:начало -->"
 DOC_END = "<!-- готовые-файлы:конец -->"

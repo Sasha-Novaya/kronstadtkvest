@@ -34,8 +34,21 @@ export type QuestTheme = {
     buttonRadius: string;
     shadow: string;
   };
-  /** Герои квеста: имя и свой цвет (имя в реплике и полоска слева на карточке). */
-  heroes: Record<string, { name: string; color: string }>;
+  /** Герои квеста: подпись, свой цвет, сторона в карточке реплики, картинка по умолчанию. */
+  heroes: Record<
+    string,
+    {
+      name: string;
+      color: string;
+      /** left — над карточкой слева (макет 4); right — справа (макеты 5 и 6). */
+      side: "left" | "right";
+      defaultImage: string;
+    }
+  >;
+  lines: {
+    /** Порог длинной реплики в символах (для героя справа: макет 5 или 6). */
+    longTextChars: number;
+  };
 };
 
 /** Превращает тему в CSS-переменные, которые используют стили экранов. */
