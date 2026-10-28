@@ -1,17 +1,7 @@
-"use client";
-
-import { useState } from "react";
+import Image from "next/image";
 import styles from "./theme.module.css";
 
 const IMAGES = "/quests/kronstadt-walk/images/";
-
-const THEMES = [
-  { id: "journal", name: "Судовой журнал" },
-  { id: "night", name: "Ночной рейд" },
-  { id: "harbor", name: "Солнечная гавань" },
-] as const;
-
-type ThemeId = (typeof THEMES)[number]["id"];
 
 // Тексты — из docs/tz-stancii-1-2.md (станция 1, вступление, станция 2).
 const LINES = [
@@ -19,35 +9,23 @@ const LINES = [
     hero: "fedot",
     name: "Капитан Федот Селёдкин",
     image: "fedot-1.webp",
+    width: 700,
+    height: 710,
     text: "Свистать всех наверх! Так. Вижу, экипаж на месте. Разрешите представиться. Капитан первого ранга в отставке. Федот Селёдкин.",
   },
   {
     hero: "klusha",
     name: "Клуша",
     image: "klusha-1.webp",
+    width: 700,
+    height: 699,
     text: "Зато на суше есть булочки, пирожки, пекаренки… Меня Клуша зовут! Всем привет!",
   },
 ] as const;
 
 export default function ThemeLab() {
-  const [theme, setTheme] = useState<ThemeId>("journal");
-
   return (
-    <div className={styles.lab} data-theme={theme}>
-      <nav className={styles.switcher} aria-label="Вариант оформления">
-        {THEMES.map((t, i) => (
-          <button
-            key={t.id}
-            type="button"
-            className={styles.switch}
-            aria-pressed={theme === t.id}
-            onClick={() => setTheme(t.id)}
-          >
-            {i + 1}. {t.name}
-          </button>
-        ))}
-      </nav>
-
+    <div className={styles.lab}>
       <main className={styles.screen}>
         <p className={styles.kicker}>Станция 1</p>
         <h1 className={styles.title}>Куда вы попали + Поющий фонтан</h1>
@@ -77,17 +55,19 @@ export default function ThemeLab() {
 
         {LINES.map((line) => (
           <article key={line.hero} className={styles.line} data-hero={line.hero}>
-            <div
-              className={styles.avatar}
-              data-hero={line.hero}
-              style={{ backgroundImage: `url(${IMAGES}${line.image})` }}
-              role="img"
-              aria-label={line.name}
-            />
-            <div>
+            <div className={styles.lineBody}>
               <p className={styles.heroName}>{line.name}</p>
               <p className={styles.lineText}>{line.text}</p>
             </div>
+            {/* Герой крупно: нижний край картинки стоит на нижней рамке карточки */}
+            <Image
+              className={styles.hero}
+              src={IMAGES + line.image}
+              alt={line.name}
+              width={line.width}
+              height={line.height}
+              sizes="260px"
+            />
           </article>
         ))}
 

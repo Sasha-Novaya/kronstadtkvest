@@ -1,73 +1,10 @@
 /*
+  Тема «Солнечная гавань» (выбрана Сашей 28.10.2026).
   Тема = набор переменных (как в ТЗ платформы, раздел 12): основной и акцентный цвет,
   фон и его текстура, шрифт заголовков, форма кнопок, цвета героев.
+  Шрифт временный — Саша подберёт свой.
 */
-
-/* 1. Судовой журнал — старая бумага, тёмно-синие чернила, латунь */
-.lab[data-theme="journal"] {
-  --bg: #f1e2c0;
-  --bg-texture:
-    radial-gradient(circle at 15% 10%, rgba(255, 250, 235, 0.7), transparent 45%),
-    radial-gradient(circle at 85% 90%, rgba(150, 100, 40, 0.18), transparent 50%),
-    radial-gradient(circle at 70% 30%, rgba(160, 110, 50, 0.1), transparent 35%);
-  --text: #2b2118;
-  --muted: #5c4a35;
-  --heading: #1b2f55;
-  --heading-font: "PT Serif", Georgia, serif;
-  --body-font: "PT Sans", system-ui, sans-serif;
-  --primary: #1b2f55;
-  --primary-text: #fbf3df;
-  --primary-border: #b8863b;
-  --secondary-text: #1b2f55;
-  --secondary-border: #1b2f55;
-  --accent: #b8863b;
-  --surface: #fbf3df;
-  --surface-border: #c99b55;
-  --input-bg: #fffaf0;
-  --radius: 10px;
-  --button-radius: 10px;
-  --shadow: 0 2px 0 rgba(90, 60, 20, 0.25);
-  --fedot: #1b2f55;
-  --klusha: #1f5fc4;
-  --switch-bg: #1b2f55;
-  --switch-text: #fbf3df;
-}
-
-/* 2. Ночной рейд — ночное море, золотые огни, голубые ленты Клуши */
-.lab[data-theme="night"] {
-  --bg: #0e1d38;
-  --bg-texture:
-    radial-gradient(1.5px 1.5px at 12% 8%, rgba(255, 255, 255, 0.7), transparent),
-    radial-gradient(1.5px 1.5px at 78% 5%, rgba(255, 255, 255, 0.6), transparent),
-    radial-gradient(1px 1px at 55% 14%, rgba(255, 255, 255, 0.5), transparent),
-    radial-gradient(1px 1px at 30% 20%, rgba(255, 255, 255, 0.5), transparent),
-    radial-gradient(ellipse at 50% 0%, #22427a, transparent 60%),
-    linear-gradient(#10224a, #0a1630);
-  --text: #eaf0f8;
-  --muted: #b9c7dc;
-  --heading: #f0c069;
-  --heading-font: "Lora", Georgia, serif;
-  --body-font: "PT Sans", system-ui, sans-serif;
-  --primary: #f0c069;
-  --primary-text: #10203e;
-  --primary-border: #f0c069;
-  --secondary-text: #eaf0f8;
-  --secondary-border: #8fb3e6;
-  --accent: #f0c069;
-  --surface: #172d55;
-  --surface-border: rgba(240, 192, 105, 0.45);
-  --input-bg: #0d1a33;
-  --radius: 14px;
-  --button-radius: 14px;
-  --shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
-  --fedot: #f0c069;
-  --klusha: #8cc4ff;
-  --switch-bg: #f0c069;
-  --switch-text: #10203e;
-}
-
-/* 3. Солнечная гавань — небо и вода, круглые кнопки, мультяшная лёгкость */
-.lab[data-theme="harbor"] {
+.lab {
   --bg: #e4f3ff;
   --bg-texture:
     radial-gradient(ellipse at 80% -10%, rgba(255, 214, 120, 0.45), transparent 50%),
@@ -79,23 +16,18 @@
   --body-font: "Nunito", system-ui, sans-serif;
   --primary: #1458b8;
   --primary-text: #ffffff;
-  --primary-border: #1458b8;
-  --secondary-text: #1458b8;
-  --secondary-border: #1458b8;
+  --secondary: #1458b8;
   --accent: #f39a1e;
   --surface: #ffffff;
-  --surface-border: #bfe0fb;
+  --surface-border: #5d9ad6;
+  --track: #c9dcf0;
   --input-bg: #ffffff;
   --radius: 22px;
   --button-radius: 999px;
   --shadow: 0 8px 22px rgba(20, 88, 184, 0.14);
   --fedot: #0d3a6e;
   --klusha: #b4530a;
-  --switch-bg: #1458b8;
-  --switch-text: #ffffff;
-}
 
-.lab {
   min-height: 100dvh;
   background: var(--bg-texture), var(--bg);
   color: var(--text);
@@ -105,37 +37,6 @@
   overflow-x: hidden;
 }
 
-/* Переключатель вариантов */
-.switcher {
-  position: sticky;
-  top: 0;
-  z-index: 10;
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 6px;
-  padding: 8px;
-  background: rgba(0, 0, 0, 0.55);
-  backdrop-filter: blur(6px);
-}
-
-.switch {
-  min-height: 48px;
-  padding: 4px 6px;
-  border: 2px solid transparent;
-  border-radius: 10px;
-  background: rgba(255, 255, 255, 0.92);
-  color: #1b2433;
-  font: 700 14px/1.2 system-ui, sans-serif;
-  cursor: pointer;
-}
-
-.switch[aria-pressed="true"] {
-  background: var(--switch-bg);
-  color: var(--switch-text);
-  border-color: #fff;
-}
-
-/* Экран */
 .screen {
   max-width: 34rem;
   margin: 0 auto;
@@ -155,14 +56,10 @@
 
 .title {
   font-family: var(--heading-font);
-  font-weight: 700;
+  font-weight: 800;
   font-size: clamp(28px, 8vw, 36px);
   line-height: 1.15;
   color: var(--heading);
-}
-
-.lab[data-theme="harbor"] .title {
-  font-weight: 800;
 }
 
 .text {
@@ -177,20 +74,18 @@
   border-radius: var(--button-radius);
   font: 700 18px/1.2 var(--body-font);
   cursor: pointer;
-  border: 2px solid;
+  border: 2px solid var(--primary);
 }
 
 .primary {
   background: var(--primary);
   color: var(--primary-text);
-  border-color: var(--primary-border);
   box-shadow: var(--shadow);
 }
 
 .secondary {
   background: transparent;
-  color: var(--secondary-text);
-  border-color: var(--secondary-border);
+  color: var(--secondary);
 }
 
 .buttons {
@@ -199,7 +94,7 @@
   gap: 10px;
 }
 
-/* Плеер */
+/* Карточки */
 .player,
 .task,
 .line {
@@ -207,15 +102,17 @@
   border: 2px solid var(--surface-border);
   border-radius: var(--radius);
   box-shadow: var(--shadow);
-  padding: 14px;
 }
 
-.player {
+.player,
+.task {
+  padding: 14px;
   display: flex;
   flex-direction: column;
   gap: 10px;
 }
 
+/* Плеер */
 .listen {
   min-height: 64px;
   font-size: 22px;
@@ -224,7 +121,7 @@
 .track {
   height: 10px;
   border-radius: 999px;
-  background: color-mix(in srgb, var(--text) 18%, transparent);
+  background: var(--track);
   overflow: hidden;
 }
 
@@ -250,9 +147,9 @@
 .control {
   min-height: 48px;
   border-radius: var(--button-radius);
-  border: 2px solid var(--secondary-border);
+  border: 2px solid var(--secondary);
   background: transparent;
-  color: var(--secondary-text);
+  color: var(--secondary);
   font: 700 17px/1.1 var(--body-font);
   cursor: pointer;
 }
@@ -263,53 +160,53 @@
   padding: 0 4px;
   background: none;
   border: none;
-  color: var(--secondary-text);
+  color: var(--secondary);
   font: 700 17px var(--body-font);
   text-decoration: underline;
   text-underline-offset: 4px;
   cursor: pointer;
 }
 
-/* Реплика героя: имя и полоска — цветом героя (ТЗ платформы, П7) */
+/*
+  Реплика героя: сверху имя и текст, ниже крупно герой. Нижний край картинки
+  стоит на нижней рамке карточки. Имя — цветом героя (ТЗ платформы, П7).
+*/
 .line {
-  display: grid;
-  grid-template-columns: 64px 1fr;
-  gap: 12px;
-  align-items: start;
-  border-left-width: 6px;
-}
-
-.line[data-hero="fedot"] {
-  border-left-color: var(--fedot);
+  display: flex;
+  flex-direction: column;
 }
 
 .line[data-hero="klusha"] {
-  border-left-color: var(--klusha);
+  align-items: flex-end;
 }
 
-.avatar {
-  width: 64px;
-  height: 64px;
-  border-radius: 50%;
-  border: 3px solid var(--accent);
-  background-color: color-mix(in srgb, var(--accent) 22%, var(--surface));
-  background-repeat: no-repeat;
+.hero {
+  display: block;
+  width: 68%;
+  max-width: 260px;
+  height: auto;
+  margin-top: 4px;
 }
 
-.avatar[data-hero="fedot"] {
-  background-size: 230%;
-  background-position: 42% 4%;
+/* Повторяем скруглённый нижний угол карточки, чтобы картинка не вылезала за рамку */
+.line[data-hero="fedot"] .hero {
+  border-bottom-left-radius: calc(var(--radius) - 2px);
 }
 
-.avatar[data-hero="klusha"] {
-  background-size: 250%;
-  background-position: 30% 4%;
+.line[data-hero="klusha"] .hero {
+  border-bottom-right-radius: calc(var(--radius) - 2px);
+}
+
+.lineBody {
+  align-self: stretch;
+  padding: 14px 16px 0;
 }
 
 .heroName {
   font-family: var(--heading-font);
-  font-weight: 700;
-  font-size: 18px;
+  font-weight: 800;
+  font-size: 19px;
+  line-height: 1.25;
 }
 
 .line[data-hero="fedot"] .heroName {
@@ -322,15 +219,10 @@
 
 .lineText {
   font-size: 18px;
+  margin-top: 4px;
 }
 
 /* Задание и поле ответа */
-.task {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
 .question {
   font-size: 18px;
   font-weight: 700;
@@ -340,7 +232,7 @@
   min-height: 56px;
   width: 100%;
   padding: 8px 16px;
-  border: 2px solid var(--secondary-border);
+  border: 2px solid var(--surface-border);
   border-radius: var(--radius);
   background: var(--input-bg);
   color: var(--text);
@@ -350,8 +242,7 @@
 
 .input:focus,
 .button:focus-visible,
-.control:focus-visible,
-.switch:focus-visible {
+.control:focus-visible {
   outline: 3px solid var(--accent);
   outline-offset: 2px;
 }
