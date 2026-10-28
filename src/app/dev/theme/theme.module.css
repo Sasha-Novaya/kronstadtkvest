@@ -1,33 +1,8 @@
 /*
-  Тема «Солнечная гавань» (выбрана Сашей 28.10.2026).
-  Тема = набор переменных (как в ТЗ платформы, раздел 12): основной и акцентный цвет,
-  фон и его текстура, шрифт заголовков, форма кнопок, цвета героев.
-  Шрифт временный — Саша подберёт свой.
+  Стили экрана. Цвета, шрифты и форма кнопок приходят из темы квеста
+  (src/quests/kronstadt-walk/theme.ts) через CSS-переменные — здесь их не задаём.
 */
 .lab {
-  --bg: #e4f3ff;
-  --bg-texture:
-    radial-gradient(ellipse at 80% -10%, rgba(255, 214, 120, 0.45), transparent 50%),
-    linear-gradient(#cfeaff 0%, #eef8ff 45%, #fff7e8 100%);
-  --text: #12345a;
-  --muted: #3b5779;
-  --heading: #0d3a6e;
-  --heading-font: "Nunito", system-ui, sans-serif;
-  --body-font: "Nunito", system-ui, sans-serif;
-  --primary: #1458b8;
-  --primary-text: #ffffff;
-  --secondary: #1458b8;
-  --accent: #f39a1e;
-  --surface: #ffffff;
-  --surface-border: #5d9ad6;
-  --track: #c9dcf0;
-  --input-bg: #ffffff;
-  --radius: 22px;
-  --button-radius: 999px;
-  --shadow: 0 8px 22px rgba(20, 88, 184, 0.14);
-  --fedot: #0d3a6e;
-  --klusha: #b4530a;
-
   min-height: 100dvh;
   background: var(--bg-texture), var(--bg);
   color: var(--text);
@@ -46,19 +21,25 @@
   gap: 16px;
 }
 
-.kicker {
-  font-size: 17px;
-  font-weight: 700;
-  letter-spacing: 0.12em;
+/* Заголовки и подписи — шрифтом заголовков, всегда капсом */
+.kicker,
+.title,
+.heroName {
+  font-family: var(--heading-font);
   text-transform: uppercase;
+}
+
+.kicker {
+  font-size: 19px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
   color: var(--accent);
 }
 
 .title {
-  font-family: var(--heading-font);
-  font-weight: 800;
-  font-size: clamp(28px, 8vw, 36px);
-  line-height: 1.15;
+  font-weight: 900;
+  font-size: clamp(28px, 8vw, 34px);
+  line-height: 1.1;
   color: var(--heading);
 }
 
@@ -85,7 +66,7 @@
 
 .secondary {
   background: transparent;
-  color: var(--secondary);
+  color: var(--primary);
 }
 
 .buttons {
@@ -99,7 +80,7 @@
 .task,
 .line {
   background: var(--surface);
-  border: 2px solid var(--surface-border);
+  border: 2px solid var(--border);
   border-radius: var(--radius);
   box-shadow: var(--shadow);
 }
@@ -147,9 +128,9 @@
 .control {
   min-height: 48px;
   border-radius: var(--button-radius);
-  border: 2px solid var(--secondary);
+  border: 2px solid var(--primary);
   background: transparent;
-  color: var(--secondary);
+  color: var(--primary);
   font: 700 17px/1.1 var(--body-font);
   cursor: pointer;
 }
@@ -160,7 +141,7 @@
   padding: 0 4px;
   background: none;
   border: none;
-  color: var(--secondary);
+  color: var(--primary);
   font: 700 17px var(--body-font);
   text-decoration: underline;
   text-underline-offset: 4px;
@@ -169,11 +150,12 @@
 
 /*
   Реплика героя: сверху имя и текст, ниже крупно герой. Нижний край картинки
-  стоит на нижней рамке карточки. Имя — цветом героя (ТЗ платформы, П7).
+  стоит на нижней рамке карточки. Имя и полоска слева — цветом героя (--hero-color).
 */
 .line {
   display: flex;
   flex-direction: column;
+  border-left: 8px solid var(--hero-color);
 }
 
 .line[data-hero="klusha"] {
@@ -190,7 +172,7 @@
 
 /* Повторяем скруглённый нижний угол карточки, чтобы картинка не вылезала за рамку */
 .line[data-hero="fedot"] .hero {
-  border-bottom-left-radius: calc(var(--radius) - 2px);
+  border-bottom-left-radius: calc(var(--radius) - 8px);
 }
 
 .line[data-hero="klusha"] .hero {
@@ -203,23 +185,16 @@
 }
 
 .heroName {
-  font-family: var(--heading-font);
-  font-weight: 800;
+  font-weight: 700;
   font-size: 19px;
-  line-height: 1.25;
-}
-
-.line[data-hero="fedot"] .heroName {
-  color: var(--fedot);
-}
-
-.line[data-hero="klusha"] .heroName {
-  color: var(--klusha);
+  line-height: 1.2;
+  letter-spacing: 0.04em;
+  color: var(--hero-color);
 }
 
 .lineText {
   font-size: 18px;
-  margin-top: 4px;
+  margin-top: 6px;
 }
 
 /* Задание и поле ответа */
@@ -232,7 +207,7 @@
   min-height: 56px;
   width: 100%;
   padding: 8px 16px;
-  border: 2px solid var(--surface-border);
+  border: 2px solid var(--border);
   border-radius: var(--radius);
   background: var(--input-bg);
   color: var(--text);

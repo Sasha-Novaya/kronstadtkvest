@@ -1,4 +1,6 @@
 import Image from "next/image";
+import { heroVariables, themeVariables } from "@/lib/theme";
+import { hirroSans, kronstadtWalkTheme as theme } from "@/quests/kronstadt-walk/theme";
 import styles from "./theme.module.css";
 
 const IMAGES = "/quests/kronstadt-walk/images/";
@@ -7,7 +9,6 @@ const IMAGES = "/quests/kronstadt-walk/images/";
 const LINES = [
   {
     hero: "fedot",
-    name: "Капитан Федот Селёдкин",
     image: "fedot-1.webp",
     width: 700,
     height: 710,
@@ -15,7 +16,6 @@ const LINES = [
   },
   {
     hero: "klusha",
-    name: "Клуша",
     image: "klusha-1.webp",
     width: 700,
     height: 699,
@@ -25,7 +25,7 @@ const LINES = [
 
 export default function ThemeLab() {
   return (
-    <div className={styles.lab}>
+    <div className={`${styles.lab} ${hirroSans.variable}`} style={themeVariables(theme)}>
       <main className={styles.screen}>
         <p className={styles.kicker}>Станция 1</p>
         <h1 className={styles.title}>Куда вы попали + Поющий фонтан</h1>
@@ -53,23 +53,31 @@ export default function ThemeLab() {
           <button type="button" className={styles.textToggle}>Текст ▾</button>
         </section>
 
-        {LINES.map((line) => (
-          <article key={line.hero} className={styles.line} data-hero={line.hero}>
-            <div className={styles.lineBody}>
-              <p className={styles.heroName}>{line.name}</p>
-              <p className={styles.lineText}>{line.text}</p>
-            </div>
-            {/* Герой крупно: нижний край картинки стоит на нижней рамке карточки */}
-            <Image
-              className={styles.hero}
-              src={IMAGES + line.image}
-              alt={line.name}
-              width={line.width}
-              height={line.height}
-              sizes="260px"
-            />
-          </article>
-        ))}
+        {LINES.map((line) => {
+          const name = theme.heroes[line.hero].name;
+          return (
+            <article
+              key={line.hero}
+              className={styles.line}
+              data-hero={line.hero}
+              style={heroVariables(theme, line.hero)}
+            >
+              <div className={styles.lineBody}>
+                <p className={styles.heroName}>{name}</p>
+                <p className={styles.lineText}>{line.text}</p>
+              </div>
+              {/* Герой крупно: нижний край картинки стоит на нижней рамке карточки */}
+              <Image
+                className={styles.hero}
+                src={IMAGES + line.image}
+                alt={name}
+                width={line.width}
+                height={line.height}
+                sizes="260px"
+              />
+            </article>
+          );
+        })}
 
         <section className={styles.task}>
           <label htmlFor="answer" className={styles.question}>
