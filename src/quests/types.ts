@@ -44,10 +44,16 @@ export type Step = AudioStep | ChoiceTaskStep | JournalPageStep | TipStep;
 export type Station = {
   id: string;
   number: number;
+  /** Название станции по ТЗ. */
   title: string;
+  /** Короткое название для заголовка экрана (решение Саши, 29.10.2026). */
+  shortTitle: string;
   landmark: string;
   steps: Step[];
   next: {
+    /** Номер и название следующей станции — для заголовка экрана пути. */
+    stationNumber: number;
+    stationTitle: string;
     text: string;
     arrival: string;
     point: { name: string; lat: number; lon: number };

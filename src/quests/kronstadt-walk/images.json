@@ -163,11 +163,11 @@
     "file": "journal-2.webp",
     "code": "Ж2",
     "id": "J2",
-    "source": "Ж2 страница.png",
+    "source": "Ж2 журнал чистый.webp",
     "kind": "flat",
     "width": 941,
     "height": 1672,
-    "kb": 100
+    "kb": 74
   },
   {
     "file": "journal-3.webp",
@@ -298,6 +298,16 @@
     "width": 1000,
     "height": 1032,
     "kb": 65
+  },
+  {
+    "file": "mini-map.webp",
+    "code": "Мини-карта",
+    "id": "mini-map",
+    "source": "Мини-карта.webp",
+    "kind": "cutout",
+    "width": 600,
+    "height": 517,
+    "kb": 70
   },
   {
     "file": "fedot-reference.webp",

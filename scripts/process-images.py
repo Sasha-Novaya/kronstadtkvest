@@ -38,6 +38,7 @@ DOC_END = "<!-- готовые-файлы:конец -->"
 
 HERO = "hero"  # вырезать фон
 FLAT = "flat"  # фон не трогать
+CUTOUT = "cutout"  # фон уже прозрачный: оставить его, а саму картинку сделать непрозрачной
 
 # (готовое имя без .webp, код из таблицы, ID, исходный файл, тип)
 IMAGES = [
@@ -57,7 +58,7 @@ IMAGES = [
     ("klusha-5-album", "К5-альбом", "K5-album", "К5 записки.png", HERO),
     ("klusha-6", "К6", "K6", "К6 указка.png", HERO),
     ("journal-1", "Ж1", "J1", "Ж1.png", FLAT),
-    ("journal-2", "Ж2", "J2", "Ж2 страница.png", FLAT),
+    ("journal-2", "Ж2", "J2", "Ж2 журнал чистый.webp", FLAT),
     ("journal-3", "Ж3", "J3", "Ж3 прогресс.png", FLAT),
     ("gramota", "ГР", "GR", "ГР грамота.png", FLAT),
     ("ill-klusha-svertok", "—", "ill-klusha-svertok", "завязка.png", FLAT),
@@ -71,10 +72,12 @@ IMAGES = [
     ("ill-oranienbaum", "—", "ill-oranienbaum", "Ст17_гравюра_Проспект_Ораниенбаума.png", FLAT),
     ("ill-navodnenie-1824", "—", "ill-navodnenie-1824", "ст 18 наводнение.png", FLAT),
     ("ill-futshtok-shema", "—", "ill-futshtok-shema", "Ст19_схема_футштока.png", FLAT),
+    ("mini-map", "Мини-карта", "mini-map", "Мини-карта.webp", CUTOUT),
     ("fedot-reference", "запас", "—", "Капитан референс.png", FLAT),
     ("klusha-reference", "запас", "—", "чайка референс.png", FLAT),
 ]
 
+CUTOUT_WIDTH = 600
 HERO_WIDTH = 700
 HERO_MAX_KB = 100
 FLAT_WIDTH = 1200
@@ -114,6 +117,18 @@ def cut_out(img: Image.Image) -> Image.Image:
     return out.crop(box) if box else out
 
 
+def make_opaque(img: Image.Image) -> Image.Image:
+    """Картинка уже вырезана, но сама слегка полупрозрачная (альфа ~252):
+    делаем её полностью непрозрачной, мягкий край по контуру оставляем."""
+    rgba = img.convert("RGBA")
+    px = np.asarray(rgba).copy()
+    alpha = px[..., 3]
+    alpha[alpha >= 200] = 255
+    out = Image.fromarray(px, "RGBA")
+    box = Image.fromarray((alpha > 8).astype(np.uint8) * 255).getbbox()
+    return out.crop(box) if box else out
+
+
 def resize_to_width(img: Image.Image, width: int) -> Image.Image:
     if img.width <= width:
         return img
@@ -136,6 +151,9 @@ def process(name: str, src_name: str, kind: str) -> dict:
     src = Image.open(SRC_DIR / src_name)
     if kind == HERO:
         img = resize_to_width(cut_out(src), HERO_WIDTH)
+        data, quality = encode(img, 80, HERO_MAX_KB)
+    elif kind == CUTOUT:
+        img = resize_to_width(make_opaque(src), CUTOUT_WIDTH)
         data, quality = encode(img, 80, HERO_MAX_KB)
     else:
         img = resize_to_width(src.convert("RGB"), FLAT_WIDTH)

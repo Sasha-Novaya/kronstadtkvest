@@ -24,15 +24,15 @@ function Caption({ asset }: { asset: Asset }) {
 }
 
 export default function AssetsPage() {
-  const heroes = assets.filter((a) => a.kind === "hero");
-  const others = assets.filter((a) => a.kind !== "hero");
+  const heroes = assets.filter((a) => a.kind !== "flat");
+  const others = assets.filter((a) => a.kind === "flat");
 
   return (
     <main className={styles.page}>
       <h1>Картинки квеста kronstadt-walk</h1>
       <p>Всего: {assets.length}. Служебная страница, потом удалим.</p>
 
-      <h2>Герои ({heroes.length}) — на клетчатом и тёмном фоне</h2>
+      <h2>Герои и вырезанные картинки ({heroes.length}) — на клетчатом и тёмном фоне</h2>
       {heroes.map((a) => (
         <section key={a.file} className={styles.item}>
           <Caption asset={a} />
