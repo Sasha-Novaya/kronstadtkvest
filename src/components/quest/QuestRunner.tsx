@@ -11,7 +11,6 @@ import type {
   Header,
   MemoStep,
   Part,
-  PickStep,
   Point,
   TaskStep,
   VoteStep,
@@ -70,11 +69,15 @@ export default function QuestRunner({ parts, startPart = 0, theme, baseUrl, font
   const [history, setHistory] = useState<Screen[]>([first]);
   const [tasks, setTasks] = useState<Record<string, TaskState>>({});
   const [pages, setPages] = useState<number[]>([]);
-  // Переменные квеста (например, выбранный автобус) и имена экипажа для грамоты.
-  const [vars, setVars] = useState<Record<string, string>>({});
+  // Имена экипажа для грамоты.
   const [crew, setCrew] = useState<string[]>([""]);
   // Подпись под мини-картой — только на первом экране с картой во всём квесте.
-  const [firstMap, setFirstMap] = useState<string | null>(null);
+  // Если квест начинается прямо с экрана с картой — подпись на нём.
+  const mapAt = (p: number, i: number) => {
+    const step = parts[p].steps[i];
+    return step.type === "walk" && step.point ? `${p}:${i}` : null;
+  };
+  const [firstMap, setFirstMap] = useState<string | null>(() => mapAt(startPart, 0));
   // Картинка, открытая на весь экран (звук и экран под ней не трогаем).
   const [viewer, setViewer] = useState<ReactNode>(null);
 
@@ -86,10 +89,7 @@ export default function QuestRunner({ parts, startPart = 0, theme, baseUrl, font
 
   const go = (next: Screen, keepAudio = false) => {
     if (!keepAudio) player.stop();
-    if (next.kind === "step" && !firstMap) {
-      const step = parts[next.p].steps[next.i];
-      if (step.type === "walk" && step.point) setFirstMap(key(next.p, next.i));
-    }
+    if (next.kind === "step" && !firstMap) setFirstMap(mapAt(next.p, next.i));
     setHistory((h) => [...h, next]);
   };
   const back = () => {
@@ -109,9 +109,8 @@ export default function QuestRunner({ parts, startPart = 0, theme, baseUrl, font
     setHistory([first]);
     setTasks({});
     setPages([]);
-    setVars({});
     setCrew([""]);
-    setFirstMap(null);
+    setFirstMap(mapAt(startPart, 0));
   };
 
   const onBack = history.length > 1 ? back : undefined;
@@ -143,7 +142,7 @@ export default function QuestRunner({ parts, startPart = 0, theme, baseUrl, font
     const { p, i } = screen;
     const part = parts[p];
     const step = part.steps[i];
-    const frame = { header: step.header ?? part.header, onBack };
+    const frame = { header: step.header ?? part.header, align: step.headerAlign, onBack };
     const next = () => go(after(p, i));
 
     if ((step.type === "task" || step.type === "vote") && screen.kind === "found") {
@@ -241,24 +240,11 @@ export default function QuestRunner({ parts, startPart = 0, theme, baseUrl, font
           onNext={next}
         />
       );
-    } else if (step.type === "pick") {
-      content = (
-        <PickScreen
-          {...frame}
-          step={step}
-          chosen={vars[step.variable]}
-          onChoose={(value) => {
-            setVars((v) => ({ ...v, [step.variable]: value }));
-            next();
-          }}
-        />
-      );
     } else if (step.type === "walk") {
       content = (
         <WalkScreen
           {...frame}
           step={step}
-          vars={vars}
           showMapHint={firstMap === key(p, i)}
           onNext={next}
         />
@@ -324,11 +310,14 @@ export default function QuestRunner({ parts, startPart = 0, theme, baseUrl, font
 
 function Frame({
   header,
+  align = "right",
   onBack,
   footer,
   children,
 }: {
   header: Header;
+  /** Шапка справа (обычно) или слева рядом со стрелкой — когда справа стоит герой. */
+  align?: "left" | "right";
   onBack?: () => void;
   footer: ReactNode;
   children: ReactNode;
@@ -342,7 +331,14 @@ function Frame({
             <BackArrow />
           </button>
         )}
-        <header className={`${styles.head} ${onBack && !header.kicker ? styles.headNoKicker : ""}`}>
+        {/* Отступ под стрелку нужен только тексту, который стоит на её линии */}
+        <header
+          className={[
+            styles.head,
+            onBack && (!header.kicker || align === "left") ? styles.headWithBack : "",
+            align === "left" ? styles.headLeft : "",
+          ].join(" ")}
+        >
           {header.kicker && <p className={styles.kicker}>{header.kicker}</p>}
           <h1 className={styles.title}>{header.title}</h1>
         </header>
@@ -636,6 +632,7 @@ function TaskScreen({
 
 function VoteScreen({
   header,
+  align,
   onBack,
   step,
   theme,
@@ -644,6 +641,7 @@ function VoteScreen({
   onSolvedNext,
 }: {
   header: Header;
+  align?: "left" | "right";
   onBack?: () => void;
   step: VoteStep;
   theme: QuestTheme;
@@ -653,8 +651,15 @@ function VoteScreen({
 }) {
   const answered = chosen !== null;
   return (
-    <Frame header={header} onBack={onBack} footer={answered ? <NextButton onClick={onSolvedNext} /> : null}>
-      <HeroLine theme={theme} hero={step.hero} image={step.image} label={step.label} text={step.text}>
+    <Frame header={header} align={align} onBack={onBack} footer={answered ? <NextButton onClick={onSolvedNext} /> : null}>
+      <HeroLine
+        theme={theme}
+        hero={step.hero}
+        image={step.image}
+        side={step.heroSide}
+        label={step.label}
+        text={step.text}
+      >
         <div className={styles.voteButtons}>
           {step.options.map((option, i) => (
             <button
@@ -679,74 +684,30 @@ function VoteScreen({
   );
 }
 
-/* ---------- Выбор с запоминанием (автобус) ---------- */
-
-function PickScreen({
-  header,
-  onBack,
-  step,
-  chosen,
-  onChoose,
-}: {
-  header: Header;
-  onBack?: () => void;
-  step: PickStep;
-  chosen?: string;
-  onChoose: (value: string) => void;
-}) {
-  return (
-    <Frame header={header} onBack={onBack} footer={null}>
-      <div className={styles.taskCard}>
-        {step.paragraphs.map((text) => (
-          <p key={text}>
-            <Rich text={text} />
-          </p>
-        ))}
-        <div className={styles.voteButtons}>
-          {step.options.map((option) => (
-            <button
-              key={option}
-              type="button"
-              className={`${styles.option} ${styles.voteOption} ${chosen === option ? styles.optionSelected : ""}`}
-              onClick={() => onChoose(option)}
-            >
-              {option}
-            </button>
-          ))}
-        </div>
-      </div>
-    </Frame>
-  );
-}
-
 /* ---------- Путь: к станции или внутри станции ---------- */
 
 function WalkScreen({
   header,
   onBack,
   step,
-  vars,
   showMapHint,
   onNext,
 }: {
   header: Header;
   onBack?: () => void;
   step: WalkStep;
-  vars: Record<string, string>;
   /** Подпись под картой — только при самом первом показе карты в квесте. */
   showMapHint: boolean;
   onNext: () => void;
 }) {
-  const text =
-    typeof step.text === "string"
-      ? step.text
-      : (step.text.options[vars[step.text.variable]] ?? Object.values(step.text.options)[0]);
   return (
     <Frame header={header} onBack={onBack} footer={<NextButton onClick={onNext} label={step.button} />}>
       <article className={`${styles.walkCard} ${step.point ? styles.walkWithMap : ""}`}>
         <div className={styles.walkText}>
           {step.point && <MiniMap point={step.point} showHint={showMapHint} />}
-          <p>{text}</p>
+          <p>
+            <Rich text={step.text} />
+          </p>
         </div>
         <p className={styles.arrival}>{step.arrival}</p>
       </article>

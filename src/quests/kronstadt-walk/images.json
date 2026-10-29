@@ -164,10 +164,10 @@
     "code": "Ж1",
     "id": "J1",
     "source": "Ж1.png",
-    "kind": "flat",
-    "width": 1200,
-    "height": 1200,
-    "kb": 203
+    "kind": "hero",
+    "width": 700,
+    "height": 820,
+    "kb": 104
   },
   {
     "file": "journal-2.webp",

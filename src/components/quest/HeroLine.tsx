@@ -8,6 +8,8 @@ type Props = {
   theme: QuestTheme;
   hero: string;
   image?: string;
+  /** С какой стороны над карточкой стоит герой; по умолчанию слева. */
+  side?: "left" | "right";
   /** Подпись над текстом; по умолчанию — имя героя. */
   label?: ReactNode;
   text: string;
@@ -16,17 +18,21 @@ type Props = {
 };
 
 /**
- * Реплика героя. Герой всегда слева над карточкой, текст — во всю ширину карточки.
+ * Реплика героя. Герой над карточкой (обычно слева, на отдельных экранах справа),
+ * текст — во всю ширину карточки.
  * - stand = behind (Федот): обрезанный низ прячется за верхней рамкой.
  * - stand = onBorder (Клуша): стоит лапками на верхней рамке, поверх её границы.
  * Рамка карточки — целиком в цвет героя.
  */
-export default function HeroLine({ theme, hero, image, label, text, children }: Props) {
+export default function HeroLine({ theme, hero, image, side = "left", label, text, children }: Props) {
   const settings = theme.heroes[hero];
   const img = questImage(image ?? settings.defaultImage);
 
   return (
-    <div className={styles.line} style={heroVariables(theme, hero)}>
+    <div
+      className={`${styles.line} ${styles[`line_${settings.stand}`]} ${side === "right" ? styles.lineRight : ""}`}
+      style={heroVariables(theme, hero)}
+    >
       {/* eslint-disable-next-line @next/next/no-img-element -- нужны точные размеры и отражение */}
       <img
         src={img.src}

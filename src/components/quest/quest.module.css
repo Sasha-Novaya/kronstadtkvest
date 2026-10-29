@@ -55,46 +55,49 @@
 }
 
 /*
-  Шапка: стрелка «Назад» в левом верхнем углу, заголовки справа на одной высоте с ней.
-  Стрелка стоит поверх строки «СТАНЦИЯ N» (она короткая и прижата вправо),
-  поэтому название станции получает всю ширину экрана.
+  Шапка: стрелка «Назад» в левом верхнем углу, заголовки справа.
+  Оранжевая строка стоит на одной линии со стрелкой (по центру по вертикали),
+  название — сразу под ней. Без оранжевой строки на линии стрелки стоит само название.
 */
 .headRow {
   position: relative;
 }
 
-/* Область нажатия 44×44, стрелка ~42 px в ширину */
+/* Область нажатия 44×44, сама стрелка меньше (~24 px в высоту) */
 .backButton {
   position: absolute;
   top: 0;
-  left: 0;
+  left: -10px;
   z-index: 1;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   width: 44px;
   height: 44px;
-  margin-left: -2px;
   padding: 0;
   border: none;
   background: none;
-  color: var(--primary);
   cursor: pointer;
 }
 
+/* Первая строка шапки по центру совпадает с центром стрелки (22 px от верха) */
 .head {
   padding-top: 8px;
   text-align: right;
 }
 
-/* Воздух между стрелкой «Назад» и названием: название начинается ниже стрелки */
-.kicker + .title {
-  margin-top: 18px;
+.head .title:first-child {
+  margin-top: -4px;
 }
 
-/* Без оранжевой подписи название стоит в одной строке со стрелкой — оставляем ей место */
-.headNoKicker {
-  padding-left: 52px;
+/* Текст на линии стрелки к ней не подходит */
+.headWithBack {
+  padding-left: 40px;
+}
+
+/* Шапка слева, рядом со стрелкой (когда справа над карточкой стоит герой) */
+.headLeft {
+  text-align: left;
 }
 
 .kicker,
@@ -107,6 +110,7 @@
 
 .kicker {
   font-size: 19px;
+  line-height: 28px;
   font-weight: 700;
   letter-spacing: 0.08em;
   color: var(--accent);
@@ -421,6 +425,18 @@
   align-self: flex-start;
   margin-left: 4px;
   margin-bottom: -30px;
+}
+
+/* Клуша стоит лапками на рамке: подпись в карточке опускаем ниже лапок */
+.line_onBorder .lineText {
+  padding-top: 26px;
+}
+
+/* Герой справа над карточкой (экран голосования) */
+.lineRight .lineHero {
+  align-self: flex-end;
+  margin-left: 0;
+  margin-right: 4px;
 }
 
 /* Клуша: стоит лапками на верхней рамке, поверх её границы */

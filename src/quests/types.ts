@@ -29,6 +29,8 @@ export type Point = { name: string; lat: number; lon: number };
 type Base = {
   /** Своя шапка шага; по умолчанию — шапка части. */
   header?: Header;
+  /** Шапка справа (по умолчанию) или слева, рядом со стрелкой — если справа стоит герой. */
+  headerAlign?: "left" | "right";
 };
 
 export type AudioStep = Base & {
@@ -73,21 +75,15 @@ export type VoteStep = Base & {
   text: string;
   options: string[];
   correct: number;
+  /** С какой стороны над карточкой стоит герой; по умолчанию слева. */
+  heroSide?: "left" | "right";
   afterAnswer: Clip & { image: string };
 };
 
-/** Выбор, который запоминается в переменную квеста (например, автобус). */
-export type PickStep = Base & {
-  type: "pick";
-  variable: string;
-  paragraphs: string[];
-  options: string[];
-};
-
-/** Путь: текст (может зависеть от переменной), «Вы на месте, если…», мини-карта, кнопка. */
+/** Путь: текст (можно выделять **жирным**), «Вы на месте, если…», мини-карта, кнопка. */
 export type WalkStep = Base & {
   type: "walk";
-  text: string | { variable: string; options: Record<string, string> };
+  text: string;
   arrival: string;
   point: Point | null;
   button: string;
@@ -121,7 +117,6 @@ export type Step =
   | AudioStep
   | TaskStep
   | VoteStep
-  | PickStep
   | WalkStep
   | CrewStep
   | MemoStep
