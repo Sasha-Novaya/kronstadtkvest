@@ -86,6 +86,8 @@ export type VoteStep = Base & {
   correct: number;
   /** С какой стороны над карточкой стоит герой; по умолчанию слева. */
   heroSide?: "left" | "right";
+  /** Во сколько раз герой крупнее обычного (например, 1.3). */
+  heroScale?: number;
   afterAnswer: Clip & { image: string };
 };
 

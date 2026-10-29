@@ -146,8 +146,9 @@ export default function QuestRunner({ parts, startPart = 0, theme, baseUrl, font
     const next = () => go(after(p, i));
 
     if ((step.type === "task" || step.type === "vote") && screen.kind === "found") {
+      // Ответ героя — обычный экран: шапка справа (даже если на самом задании она слева)
       content = (
-        <Frame {...frame} footer={<NextButton onClick={next} />}>
+        <Frame {...frame} align="right" footer={<NextButton onClick={next} />}>
           <HeroLine
             theme={theme}
             hero={step.afterAnswer.speaker}
@@ -663,6 +664,7 @@ function VoteScreen({
         hero={step.hero}
         image={step.image}
         side={step.heroSide}
+        scale={step.heroScale}
         label={step.label}
         text={step.text}
       >

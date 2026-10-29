@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import type { CSSProperties, ReactNode } from "react";
 import type { QuestTheme } from "@/lib/theme";
 import { heroVariables } from "@/lib/theme";
 import { questImage } from "@/quests/kronstadt-walk/images";
@@ -10,6 +10,8 @@ type Props = {
   image?: string;
   /** С какой стороны над карточкой стоит герой; по умолчанию слева. */
   side?: "left" | "right";
+  /** Во сколько раз герой крупнее обычного. */
+  scale?: number;
   /** Подпись над текстом; по умолчанию — имя героя. */
   label?: ReactNode;
   text: string;
@@ -24,14 +26,14 @@ type Props = {
  * - stand = onBorder (Клуша): стоит лапками на верхней рамке, поверх её границы.
  * Рамка карточки — целиком в цвет героя.
  */
-export default function HeroLine({ theme, hero, image, side = "left", label, text, children }: Props) {
+export default function HeroLine({ theme, hero, image, side = "left", scale = 1, label, text, children }: Props) {
   const settings = theme.heroes[hero];
   const img = questImage(image ?? settings.defaultImage);
 
   return (
     <div
       className={`${styles.line} ${styles[`line_${settings.stand}`]} ${side === "right" ? styles.lineRight : ""}`}
-      style={heroVariables(theme, hero)}
+      style={{ ...heroVariables(theme, hero), "--hero-scale": scale } as CSSProperties}
     >
       {/* eslint-disable-next-line @next/next/no-img-element -- нужны точные размеры и отражение */}
       <img

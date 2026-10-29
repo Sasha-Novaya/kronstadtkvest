@@ -26,9 +26,9 @@
               "image": "K1"
             },
             {
-              "at": 25.7,
-              "image": "K4",
-              "note": "Оценка: начало фразы «Я тут кое-что разузнала!» (пауза в записи; по доле текста ~28,9 с). Проверить на слух."
+              "at": 30,
+              "image": "K4b",
+              "side": "right"
             }
           ]
         }
@@ -55,7 +55,8 @@
         ]
       },
       "heroSide": "right",
-      "headerAlign": "left"
+      "headerAlign": "left",
+      "heroScale": 1.3
     },
     {
       "type": "walk",

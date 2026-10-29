@@ -431,7 +431,7 @@
 
 /* Федот: обрезанный низ прячется за верхней рамкой */
 .hero_behind {
-  height: min(34dvh, 290px);
+  height: calc(min(34dvh, 290px) * var(--hero-scale, 1));
   align-self: flex-start;
   margin-left: 4px;
   margin-bottom: -30px;
@@ -453,7 +453,7 @@
 .hero_onBorder {
   position: relative;
   z-index: 2;
-  height: min(34dvh, 290px);
+  height: calc(min(34dvh, 290px) * var(--hero-scale, 1));
   align-self: flex-start;
   margin-left: 4px;
   margin-bottom: -20px;
@@ -765,11 +765,11 @@
   }
 
   .hero_behind {
-    height: 26dvh;
+    height: calc(26dvh * var(--hero-scale, 1));
   }
 
   .hero_onBorder {
-    height: 27dvh;
+    height: calc(27dvh * var(--hero-scale, 1));
   }
 
   .walkWithMap {
