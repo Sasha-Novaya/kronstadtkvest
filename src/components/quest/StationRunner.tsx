@@ -507,7 +507,7 @@ function WalkScreen({
           >
             {/* eslint-disable-next-line @next/next/no-img-element -- маленькая картинка-ссылка */}
             <img src={map.src} width={map.width} height={map.height} alt="" className={styles.miniMapImage} />
-            {showMapHint && <span className={styles.miniMapHint}>Нажмите, чтобы открыть маршрут</span>}
+            {showMapHint && <span className={styles.miniMapHint}>Нажми на карту — откроется маршрут</span>}
           </a>
           <p>{station.next.text}</p>
         </div>
