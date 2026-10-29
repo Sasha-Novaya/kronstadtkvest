@@ -5,6 +5,7 @@ import type { QuestTheme } from "@/lib/theme";
 import { heroVariables, themeVariables } from "@/lib/theme";
 import { questImage } from "@/quests/kronstadt-walk/images";
 import type { AudioStep, ChoiceTaskStep, Clip, Station } from "@/quests/types";
+import BackArrow from "./BackArrow";
 import HeroLine from "./HeroLine";
 import Icon from "./Icon";
 import ImageViewer from "./ImageViewer";
@@ -214,7 +215,6 @@ function Frame({
   onBack,
   kicker,
   title,
-  subtitle,
   footer,
   children,
 }: {
@@ -223,7 +223,6 @@ function Frame({
   /** Подпись над заголовком; по умолчанию «Станция N», null — без подписи. */
   kicker?: string | null;
   title?: string;
-  subtitle?: string;
   footer: ReactNode;
   children: ReactNode;
 }) {
@@ -233,13 +232,12 @@ function Frame({
       <div className={styles.headRow}>
         {onBack && (
           <button type="button" className={styles.backButton} onClick={onBack} aria-label="Назад">
-            <Icon name="arrowLeft" size={30} />
+            <BackArrow />
           </button>
         )}
-        <header className={`${styles.head} ${onBack && kicker === null ? styles.headNoKicker : ""}`}>
+        <header className={styles.head}>
           {kicker !== null && <p className={styles.kicker}>{kicker ?? `Станция ${station.number}`}</p>}
           <h1 className={styles.title}>{title ?? station.shortTitle}</h1>
-          {subtitle && <p className={styles.subtitle}>{subtitle}</p>}
         </header>
       </div>
       <div className={styles.content}>{children}</div>
@@ -491,9 +489,8 @@ function WalkScreen({
     <Frame
       station={station}
       onBack={onBack}
-      kicker={null}
-      title={`Путь к станции ${station.next.stationNumber}`}
-      subtitle={station.next.stationTitle}
+      kicker="Путь к станции"
+      title={`${station.next.stationNumber}. ${station.next.stationTitle}`}
       footer={<NextButton onClick={onNext} label={station.next.button} />}
     >
       <article className={styles.walkCard}>

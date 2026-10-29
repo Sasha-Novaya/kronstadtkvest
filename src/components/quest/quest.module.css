@@ -63,7 +63,7 @@
   position: relative;
 }
 
-/* Область нажатия 44×44, сама стрелка меньше */
+/* Область нажатия 44×44, стрелка ~42 px в ширину */
 .backButton {
   position: absolute;
   top: 0;
@@ -74,7 +74,7 @@
   justify-content: center;
   width: 44px;
   height: 44px;
-  margin-left: -8px;
+  margin-left: -2px;
   padding: 0;
   border: none;
   background: none;
@@ -87,14 +87,8 @@
   text-align: right;
 }
 
-/* Без подписи «СТАНЦИЯ N» первая строка — само название: оставляем место под стрелку */
-.headNoKicker {
-  padding-left: 40px;
-}
-
 .kicker,
 .title,
-.subtitle,
 .heroName,
 .journalTitle {
   font-family: var(--heading-font);
@@ -113,14 +107,6 @@
   font-size: clamp(26px, 8vw, 32px);
   line-height: 1.08;
   color: var(--heading);
-}
-
-.subtitle {
-  margin-top: 2px;
-  font-weight: 700;
-  font-size: 22px;
-  letter-spacing: 0.04em;
-  color: var(--accent);
 }
 
 .content {

@@ -8,8 +8,7 @@ export type IconName =
   | "replay"
   | "compass"
   | "hint"
-  | "close"
-  | "arrowLeft";
+  | "close";
 
 const paths: Record<IconName, React.ReactNode> = {
   // Треугольник «play» со скруглёнными углами
@@ -53,16 +52,6 @@ const paths: Record<IconName, React.ReactNode> = {
     </>
   ),
   close: <path d="M6.5 6.5l11 11M17.5 6.5l-11 11" stroke="currentColor" strokeWidth="2.8" strokeLinecap="round" />,
-  // Стрелка «Назад»: толстая короткая, с треугольным наконечником, залитая, без фона
-  arrowLeft: (
-    <path
-      d="M2.5 12L11.5 3.8v4.7h9.5v7h-9.5v4.7z"
-      fill="currentColor"
-      stroke="currentColor"
-      strokeWidth="1.6"
-      strokeLinejoin="round"
-    />
-  ),
 };
 
 export default function Icon({ name, size = 22, className }: { name: IconName; size?: number; className?: string }) {
