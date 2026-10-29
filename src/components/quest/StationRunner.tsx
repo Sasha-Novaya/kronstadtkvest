@@ -7,6 +7,7 @@ import { questImage } from "@/quests/kronstadt-walk/images";
 import type { AudioStep, ChoiceTaskStep, Clip, Station } from "@/quests/types";
 import HeroLine from "./HeroLine";
 import Icon from "./Icon";
+import ImageViewer from "./ImageViewer";
 import { estimate, formatTime, useClipPlayer, visualAt, type ClipPlayer } from "./useClipPlayer";
 import styles from "./quest.module.css";
 
@@ -41,6 +42,8 @@ export default function StationRunner({ station, theme, baseUrl, fontClass, devR
   const [tasks, setTasks] = useState<Record<number, TaskState>>({});
   const [pages, setPages] = useState<number[]>([]);
   const [walkViews, setWalkViews] = useState(0);
+  // Картинка, открытая на весь экран (звук и экран под ней не трогаем).
+  const [viewer, setViewer] = useState<ReactNode>(null);
 
   const screen = history[history.length - 1];
   const taskOf = (i: number) => tasks[i] ?? freshTask;
@@ -84,7 +87,15 @@ export default function StationRunner({ station, theme, baseUrl, fontClass, devR
 
     if (step.type === "audio") {
       content = (
-        <ListenScreen key={i} {...frame} step={step} theme={theme} player={player} onNext={() => go(after(i))} />
+        <ListenScreen
+          key={i}
+          {...frame}
+          step={step}
+          theme={theme}
+          player={player}
+          onZoom={setViewer}
+          onNext={() => go(after(i))}
+        />
       );
     } else if (step.type === "task" && screen.kind === "hint") {
       content = (
@@ -144,14 +155,30 @@ export default function StationRunner({ station, theme, baseUrl, fontClass, devR
         />
       );
     } else if (step.type === "journalPage") {
+      const page = (
+        <>
+          <p className={styles.journalTitle}>
+            <span className={styles.nowrap}>Страница журнала</span>{" "}
+            <span className={styles.nowrap}>№{step.page}</span>
+          </p>
+          <p className={styles.journalText}>{step.text}</p>
+        </>
+      );
+      const background = { backgroundImage: `url(${questImage("J2").src})` };
+      const zoom = () => setViewer(<article className={styles.journal} style={background}>{page}</article>);
       content = (
         <Frame {...frame} footer={<NextButton onClick={() => go(after(i))} />}>
-          <article className={styles.journal} style={{ backgroundImage: `url(${questImage("J2").src})` }}>
-            <p className={styles.journalTitle}>
-              <span className={styles.nowrap}>Страница журнала</span>{" "}
-              <span className={styles.nowrap}>№{step.page}</span>
-            </p>
-            <p className={styles.journalText}>{step.text}</p>
+          {/* Нажатие открывает страницу на весь экран; прокрутка внутри при этом работает */}
+          <article
+            className={`${styles.journal} ${styles.zoomable}`}
+            style={background}
+            role="button"
+            tabIndex={0}
+            aria-label="Открыть страницу журнала на весь экран"
+            onClick={zoom}
+            onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && zoom()}
+          >
+            {page}
           </article>
         </Frame>
       );
@@ -175,6 +202,7 @@ export default function StationRunner({ station, theme, baseUrl, fontClass, devR
         </div>
       )}
       {content}
+      {viewer && <ImageViewer onClose={() => setViewer(null)}>{viewer}</ImageViewer>}
     </div>
   );
 }
@@ -201,16 +229,19 @@ function Frame({
 }) {
   return (
     <main className={styles.screen}>
-      {onBack && (
-        <button type="button" className={styles.backButton} onClick={onBack}>
-          <Icon name="back" size={20} /> Назад
-        </button>
-      )}
-      <header className={styles.head}>
-        {kicker !== null && <p className={styles.kicker}>{kicker ?? `Станция ${station.number}`}</p>}
-        <h1 className={styles.title}>{title ?? station.shortTitle}</h1>
-        {subtitle && <p className={styles.subtitle}>{subtitle}</p>}
-      </header>
+      {/* Зигзаг: стрелка «Назад» слева → заголовки справа → герой слева */}
+      <div className={styles.headRow}>
+        {onBack && (
+          <button type="button" className={styles.backButton} onClick={onBack} aria-label="Назад">
+            <Icon name="arrowLeft" size={30} />
+          </button>
+        )}
+        <header className={`${styles.head} ${onBack && kicker === null ? styles.headNoKicker : ""}`}>
+          {kicker !== null && <p className={styles.kicker}>{kicker ?? `Станция ${station.number}`}</p>}
+          <h1 className={styles.title}>{title ?? station.shortTitle}</h1>
+          {subtitle && <p className={styles.subtitle}>{subtitle}</p>}
+        </header>
+      </div>
       <div className={styles.content}>{children}</div>
       {footer && <div className={styles.actions}>{footer}</div>}
     </main>
@@ -233,6 +264,7 @@ function ListenScreen({
   step,
   theme,
   player,
+  onZoom,
   onNext,
 }: {
   station: Station;
@@ -240,6 +272,7 @@ function ListenScreen({
   step: AudioStep;
   theme: QuestTheme;
   player: ClipPlayer;
+  onZoom: (content: ReactNode) => void;
   onNext: () => void;
 }) {
   const [readOpen, setReadOpen] = useState(false);
@@ -271,16 +304,34 @@ function ListenScreen({
         <Icon name="compass" size={24} className={styles.landmarkIcon} />
         <span>{station.landmark}</span>
       </p>
-      <div className={styles.stage}>
-        {/* eslint-disable-next-line @next/next/no-img-element -- картинка меняется по ходу аудио */}
-        <img
-          key={image.id}
-          src={image.src}
-          width={image.width}
-          height={image.height}
-          alt=""
-          className={`${image.hero ? styles.stageHero : styles.stageIllustration} ${image.mirror ? styles.mirror : ""}`}
-        />
+      <div className={`${styles.stage} ${image.hero ? styles.stageLeft : ""}`}>
+        {image.zoomable ? (
+          <button
+            key={image.id}
+            type="button"
+            className={styles.zoomButton}
+            aria-label="Открыть картинку на весь экран"
+            onClick={() =>
+              onZoom(
+                // eslint-disable-next-line @next/next/no-img-element -- полноэкранный просмотр
+                <img src={image.src} width={image.width} height={image.height} alt="" className={styles.viewerImage} />,
+              )
+            }
+          >
+            {/* eslint-disable-next-line @next/next/no-img-element -- картинка меняется по ходу аудио */}
+            <img src={image.src} width={image.width} height={image.height} alt="" className={styles.stageIllustration} />
+          </button>
+        ) : (
+          // eslint-disable-next-line @next/next/no-img-element -- картинка меняется по ходу аудио
+          <img
+            key={image.id}
+            src={image.src}
+            width={image.width}
+            height={image.height}
+            alt=""
+            className={`${image.hero ? styles.stageHero : styles.stageIllustration} ${image.mirror ? styles.mirror : ""}`}
+          />
+        )}
       </div>
       <section className={styles.playerCard}>
         <button type="button" className={`${styles.button} ${styles.primary} ${styles.listen}`} onClick={main.action}>

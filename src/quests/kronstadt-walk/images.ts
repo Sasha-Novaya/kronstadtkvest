@@ -11,14 +11,21 @@ export type QuestImage = {
   hero: boolean;
   /** Показывать зеркально отражённой. */
   mirror: boolean;
+  /** Можно открыть на весь экран (фото, схемы, иллюстрации, журнал) — не герои и не интерфейс. */
+  zoomable: boolean;
 };
 
 const BASE = "/quests/kronstadt-walk/images/";
 
 // Зеркальное отражение — настройка картинки, а не отдельный файл.
-// К1 (машет крылом) всегда отражаем, чтобы Клуша смотрела к тексту.
-// Картинки с надписями (К4 «Правда или легенда?») не отражаем никогда.
-const MIRRORED = new Set(["K1"]);
+// Герой стоит слева от текста и должен смотреть вправо — к заголовку и тексту.
+// Здесь перечислены картинки героев, которые в исходнике смотрят ВЛЕВО: их отражаем.
+// Проверено 29.10.2026: все картинки Клуши (К1–К6) смотрят вправо — список пуст.
+const FACING_LEFT = new Set<string>([]);
+// Картинки с надписями не отражаем никогда (буквы стали бы зеркальными).
+const HAS_TEXT = new Set(["K4"]);
+// Не открываются на весь экран: герои и мини-карта (по ней открываются Яндекс Карты).
+const NOT_ZOOMABLE = new Set(["mini-map"]);
 
 const images = new Map<string, QuestImage>(
   manifest.map((m) => [
@@ -29,7 +36,8 @@ const images = new Map<string, QuestImage>(
       width: m.width,
       height: m.height,
       hero: m.kind === "hero",
-      mirror: MIRRORED.has(m.id),
+      mirror: FACING_LEFT.has(m.id) && !HAS_TEXT.has(m.id),
+      zoomable: m.kind === "flat" && !NOT_ZOOMABLE.has(m.id),
     },
   ]),
 );

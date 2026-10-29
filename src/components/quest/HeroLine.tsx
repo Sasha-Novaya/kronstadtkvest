@@ -16,44 +16,31 @@ type Props = {
 };
 
 /**
- * Реплика героя.
- * - Герой слева (Федот, макет 4): над карточкой слева, обрезанный низ прячется за верхней рамкой.
- * - Герой справа (Клуша): стоит на верхней рамке справа, лапки заходят на рамку, текст
- *   во всю ширину (макет 6). Реплика короче theme.lines.longTextChars — Клуша внутри
- *   карточки справа, лапки ниже рамки (макет 5, запасной).
+ * Реплика героя. Герой всегда слева над карточкой, текст — во всю ширину карточки.
+ * - stand = behind (Федот): обрезанный низ прячется за верхней рамкой.
+ * - stand = onBorder (Клуша): стоит лапками на верхней рамке, поверх её границы.
  * Рамка карточки — целиком в цвет героя.
  */
 export default function HeroLine({ theme, hero, image, label, text, children }: Props) {
   const settings = theme.heroes[hero];
   const img = questImage(image ?? settings.defaultImage);
-  const layout =
-    settings.side === "left"
-      ? "above"
-      : text.length > theme.lines.longTextChars
-        ? "onTop"
-        : "inside";
-
-  const picture = (
-    // eslint-disable-next-line @next/next/no-img-element -- нужны точные размеры и отражение
-    <img
-      src={img.src}
-      width={img.width}
-      height={img.height}
-      alt={settings.name}
-      className={`${styles.lineHero} ${styles[`hero_${layout}`]} ${img.mirror ? styles.mirror : ""}`}
-    />
-  );
 
   return (
-    <div className={`${styles.line} ${styles[`line_${layout}`]}`} style={heroVariables(theme, hero)}>
-      {layout !== "inside" && picture}
+    <div className={styles.line} style={heroVariables(theme, hero)}>
+      {/* eslint-disable-next-line @next/next/no-img-element -- нужны точные размеры и отражение */}
+      <img
+        src={img.src}
+        width={img.width}
+        height={img.height}
+        alt={settings.name}
+        className={`${styles.lineHero} ${styles[`hero_${settings.stand}`]} ${img.mirror ? styles.mirror : ""}`}
+      />
       <div className={styles.lineCard}>
         <div className={styles.lineText}>
           <p className={styles.heroName}>{label ?? settings.name}</p>
           <p>{text}</p>
         </div>
         {children}
-        {layout === "inside" && picture}
       </div>
     </div>
   );

@@ -54,22 +54,42 @@
   padding: 8px 16px 24px;
 }
 
+/*
+  Шапка: стрелка «Назад» в левом верхнем углу, заголовки справа на одной высоте с ней.
+  Стрелка стоит поверх строки «СТАНЦИЯ N» (она короткая и прижата вправо),
+  поэтому название станции получает всю ширину экрана.
+*/
+.headRow {
+  position: relative;
+}
+
+/* Область нажатия 44×44, сама стрелка меньше */
 .backButton {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 1;
   display: inline-flex;
   align-items: center;
-  gap: 2px;
-  min-height: 44px;
-  margin-left: -6px;
-  padding: 0 8px 0 0;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  margin-left: -8px;
+  padding: 0;
   border: none;
   background: none;
   color: var(--primary);
-  font: 700 17px var(--body-font);
   cursor: pointer;
 }
 
 .head {
-  padding-top: 4px;
+  padding-top: 8px;
+  text-align: right;
+}
+
+/* Без подписи «СТАНЦИЯ N» первая строка — само название: оставляем место под стрелку */
+.headNoKicker {
+  padding-left: 40px;
 }
 
 .kicker,
@@ -190,8 +210,14 @@
   overflow: hidden;
 }
 
+/* Герой на сцене — тоже слева, как на остальных экранах */
+.stageLeft {
+  justify-content: flex-start;
+}
+
 .stageHero {
   display: block;
+  margin-left: 4px;
   width: auto;
   height: calc(100% + 5dvh);
   max-width: 90%;
@@ -200,6 +226,18 @@
   /* низ картинки прячется за рамкой карточки плеера */
   margin-bottom: -5dvh;
   animation: appear 0.25s ease-out;
+}
+
+.zoomButton {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  border: none;
+  background: none;
+  cursor: zoom-in;
 }
 
 .stageIllustration {
@@ -234,7 +272,7 @@
 }
 
 .track {
-  flex: 1;
+  flex: 1 0 auto;
   height: 10px;
   border-radius: 999px;
   background: var(--track);
@@ -242,7 +280,10 @@
 }
 
 .trackFill {
+  /* оранжевая полоса видна всегда, даже в самом начале */
+  min-width: 10px;
   height: 100%;
+  border-radius: 999px;
   background: var(--accent);
   transition: width 0.25s linear;
 }
@@ -376,46 +417,24 @@
   transform: scaleX(-1);
 }
 
-/* Макет 4: герой над карточкой слева, обрезанный низ прячется за верхней рамкой */
-.hero_above {
+/* Герой всегда слева над карточкой и смотрит вправо — к заголовку и тексту */
+
+/* Федот: обрезанный низ прячется за верхней рамкой */
+.hero_behind {
   height: min(34dvh, 290px);
   align-self: flex-start;
   margin-left: 4px;
   margin-bottom: -30px;
 }
 
-/* Макет 6: герой стоит на верхней рамке справа, лапки заходят на рамку (поверх границы) */
-.hero_onTop {
+/* Клуша: стоит лапками на верхней рамке, поверх её границы */
+.hero_onBorder {
   position: relative;
   z-index: 2;
   height: min(34dvh, 290px);
-  align-self: flex-end;
-  margin-right: 4px;
+  align-self: flex-start;
+  margin-left: 4px;
   margin-bottom: -20px;
-}
-
-/* Макет 5 (запасной): герой справа внутри карточки, лапки свисают ниже нижней рамки */
-.line_inside {
-  padding-bottom: 34px;
-}
-
-.line_inside .lineCard {
-  min-height: 170px;
-}
-
-.line_inside .lineText {
-  padding-right: 44%;
-}
-
-.hero_inside {
-  position: absolute;
-  z-index: 2;
-  right: -4px;
-  bottom: -34px;
-  width: 46%;
-  max-height: 230px;
-  object-fit: contain;
-  object-position: bottom right;
 }
 
 /* Мини-плеер в карточке реплики */
@@ -599,11 +618,11 @@
     height: 25dvh;
   }
 
-  .hero_above {
+  .hero_behind {
     height: 26dvh;
   }
 
-  .hero_onTop {
+  .hero_onBorder {
     height: 27dvh;
   }
 
@@ -615,4 +634,64 @@
     width: 38%;
     margin-top: -46px;
   }
+}
+
+/* ---------- Картинка на весь экран ---------- */
+
+/* Затемнённый фон; нажатие мимо картинки закрывает */
+.viewer {
+  position: fixed;
+  inset: 0;
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background: rgba(5, 15, 30, 0.82);
+}
+
+/* Внутри — свои жесты: приближение двумя пальцами и сдвиг одним */
+.viewerContent {
+  width: 100%;
+  touch-action: none;
+  transform-origin: center center;
+  will-change: transform;
+}
+
+.viewerImage {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 100dvh;
+  object-fit: contain;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+.viewerClose {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border: none;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.92);
+  color: var(--heading);
+  cursor: pointer;
+}
+
+/* Страница журнала на весь экран: без ограничения высоты, весь текст сразу */
+.viewerContent .journal {
+  max-height: none;
+  overflow: visible;
+  border-radius: 0;
+}
+
+.zoomable {
+  cursor: zoom-in;
 }

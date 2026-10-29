@@ -1,7 +1,15 @@
 // Свои значки интерфейса (вместо эмодзи): простые округлые формы в стиле темы.
 // Цвет берут от текста рядом (currentColor).
 
-export type IconName = "play" | "pause" | "back10" | "replay" | "compass" | "hint" | "close" | "back";
+export type IconName =
+  | "play"
+  | "pause"
+  | "back10"
+  | "replay"
+  | "compass"
+  | "hint"
+  | "close"
+  | "arrowLeft";
 
 const paths: Record<IconName, React.ReactNode> = {
   // Треугольник «play» со скруглёнными углами
@@ -45,7 +53,16 @@ const paths: Record<IconName, React.ReactNode> = {
     </>
   ),
   close: <path d="M6.5 6.5l11 11M17.5 6.5l-11 11" stroke="currentColor" strokeWidth="2.8" strokeLinecap="round" />,
-  back: <path d="M14.5 5.5L8 12l6.5 6.5" fill="none" stroke="currentColor" strokeWidth="2.8" strokeLinecap="round" strokeLinejoin="round" />,
+  // Стрелка «Назад»: толстая короткая, с треугольным наконечником, залитая, без фона
+  arrowLeft: (
+    <path
+      d="M2.5 12L11.5 3.8v4.7h9.5v7h-9.5v4.7z"
+      fill="currentColor"
+      stroke="currentColor"
+      strokeWidth="1.6"
+      strokeLinejoin="round"
+    />
+  ),
 };
 
 export default function Icon({ name, size = 22, className }: { name: IconName; size?: number; className?: string }) {
