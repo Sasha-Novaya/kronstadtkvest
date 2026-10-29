@@ -23,7 +23,7 @@ const BASE = "/quests/kronstadt-walk/images/";
 // Проверено 29.10.2026: все картинки Клуши (К1–К6) смотрят вправо — список пуст.
 const FACING_LEFT = new Set<string>([]);
 // Картинки с надписями не отражаем никогда (буквы стали бы зеркальными).
-const HAS_TEXT = new Set(["K4"]);
+const HAS_TEXT = new Set(["K4", "K4b"]);
 // Не открываются на весь экран: герои и мини-карта (по ней открываются Яндекс Карты).
 const NOT_ZOOMABLE = new Set(["mini-map"]);
 

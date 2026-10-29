@@ -110,6 +110,16 @@
     "kb": 82
   },
   {
+    "file": "klusha-4b.webp",
+    "code": "К4b",
+    "id": "K4b",
+    "source": "K4b правда или легенда.png",
+    "kind": "hero",
+    "width": 700,
+    "height": 723,
+    "kb": 71
+  },
+  {
     "file": "klusha-5-pie.webp",
     "code": "К5-пирожок",
     "id": "K5-pie",

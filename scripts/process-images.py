@@ -53,6 +53,7 @@ IMAGES = [
     ("klusha-2", "К2", "K2", "К2 виноватая.png", HERO),
     ("klusha-3", "К3", "K3", "К3 подсказка.png", HERO),
     ("klusha-4", "К4", "K4", "К4 правда или легенда.png", HERO),
+    ("klusha-4b", "К4b", "K4b", "K4b правда или легенда.png", HERO),
     ("klusha-5-pie", "К5-пирожок", "K5-pie", "К5 пирожок.png", HERO),
     ("klusha-5-camera", "К5-фотоаппарат", "K5-camera", "К5 фотоаппарат.png", HERO),
     ("klusha-5-album", "К5-альбом", "K5-album", "К5 записки.png", HERO),
