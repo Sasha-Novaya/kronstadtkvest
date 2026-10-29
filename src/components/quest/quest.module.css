@@ -87,6 +87,16 @@
   text-align: right;
 }
 
+/* Воздух между стрелкой «Назад» и названием: название начинается ниже стрелки */
+.kicker + .title {
+  margin-top: 18px;
+}
+
+/* Без оранжевой подписи название стоит в одной строке со стрелкой — оставляем ей место */
+.headNoKicker {
+  padding-left: 52px;
+}
+
 .kicker,
 .title,
 .heroName,
@@ -496,6 +506,126 @@
   cursor: default;
 }
 
+/* Выбранный вариант (например, автобус) */
+.optionSelected {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: var(--primary-text);
+}
+
+/* Две крупные кнопки рядом: «Правда / Легенда», «101 / 101Э» */
+.voteButtons {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  padding: 0 16px 16px;
+}
+
+.taskCard .voteButtons {
+  padding: 0;
+}
+
+.voteOption {
+  min-height: 60px;
+  text-align: center;
+  font-size: 20px;
+}
+
+/* Ввод ответа: вопрос, поле и «Проверить» вместе */
+.answerForm {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.answerInput,
+.nameInput {
+  width: 100%;
+  min-height: 56px;
+  padding: 8px 16px;
+  border: 2px solid var(--border);
+  border-radius: 16px;
+  background: var(--input-bg);
+  color: var(--text);
+  font: 700 18px/1.2 var(--body-font);
+}
+
+.answerInput {
+  font-size: 26px;
+  letter-spacing: 0.2em;
+  text-align: center;
+}
+
+.answerInput:focus,
+.nameInput:focus {
+  outline: 3px solid var(--accent);
+  outline-offset: 1px;
+}
+
+.answerRight {
+  border-color: #1f8a4c;
+  background: #e6f5ec;
+  color: #1f6b3d;
+}
+
+.button:disabled {
+  opacity: 0.45;
+  cursor: default;
+  box-shadow: none;
+}
+
+/* Запишите экипаж: обложка журнала над карточкой */
+.crewCover {
+  align-self: center;
+  width: 46%;
+  max-width: 200px;
+  margin-bottom: 10px;
+  padding: 0;
+  border: none;
+  background: none;
+  cursor: zoom-in;
+}
+
+.crewCover img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* Памятка */
+.memoList {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.memoItem {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.memoIcon {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #e3efff;
+  color: var(--primary);
+}
+
+.memoNote {
+  padding: 10px 12px;
+  border-radius: 14px;
+  background: #fff1df;
+  border: 2px solid var(--accent);
+  font-weight: 700;
+}
+
 /* …и коротко трясётся */
 .shake {
   animation: shake 0.4s ease-in-out;
@@ -550,7 +680,6 @@
 /* ---------- Путь к станции ---------- */
 
 .walkCard {
-  margin-top: 40px;
   padding: 14px;
   display: flex;
   flex-direction: column;
@@ -559,6 +688,11 @@
 
 .walkText {
   display: flow-root;
+}
+
+/* С мини-картой карточка опускается: карта выходит за её верхнюю рамку */
+.walkWithMap {
+  margin-top: 40px;
 }
 
 /* Мини-карта в правом верхнем углу карточки: выходит за верхнюю рамку, текст её обтекает */
@@ -612,7 +746,7 @@
     height: 27dvh;
   }
 
-  .walkCard {
+  .walkWithMap {
     margin-top: 30px;
   }
 

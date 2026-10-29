@@ -8,7 +8,10 @@ export type IconName =
   | "replay"
   | "compass"
   | "hint"
-  | "close";
+  | "close"
+  | "question"
+  | "book"
+  | "next";
 
 const paths: Record<IconName, React.ReactNode> = {
   // Треугольник «play» со скруглёнными углами
@@ -52,6 +55,23 @@ const paths: Record<IconName, React.ReactNode> = {
     </>
   ),
   close: <path d="M6.5 6.5l11 11M17.5 6.5l-11 11" stroke="currentColor" strokeWidth="2.8" strokeLinecap="round" />,
+  // Задание: вопросительный знак в кружке
+  question: (
+    <>
+      <circle cx="12" cy="12" r="9.4" fill="none" stroke="currentColor" strokeWidth="2.2" />
+      <path d="M9.2 9.4a2.9 2.9 0 1 1 4 2.7c-.8.4-1.2 1-1.2 1.8v.6" fill="none" stroke="currentColor" strokeWidth="2.3" strokeLinecap="round" />
+      <circle cx="12" cy="17.4" r="1.4" fill="currentColor" />
+    </>
+  ),
+  // Страница журнала: раскрытая книга
+  book: (
+    <>
+      <path d="M12 6.6C10 5 7 4.6 3.5 5.2v13c3.5-.6 6.5-.2 8.5 1.4 2-1.6 5-2 8.5-1.4v-13C17 4.6 14 5 12 6.6z" fill="#f6e7c4" stroke="currentColor" strokeWidth="2" strokeLinejoin="round" />
+      <path d="M12 6.6v13" stroke="currentColor" strokeWidth="2" />
+    </>
+  ),
+  // Далее: стрелка вправо
+  next: <path d="M4 12h13M12 6l6 6-6 6" fill="none" stroke="currentColor" strokeWidth="2.8" strokeLinecap="round" strokeLinejoin="round" />,
 };
 
 export default function Icon({ name, size = 22, className }: { name: IconName; size?: number; className?: string }) {
