@@ -215,6 +215,16 @@
   justify-content: flex-start;
 }
 
+/* На вступлении Клуша стоит справа — герои друг напротив друга */
+.stageRight {
+  justify-content: flex-end;
+}
+
+.stageRight .stageHero {
+  margin-left: 0;
+  margin-right: 4px;
+}
+
 .stageHero {
   display: block;
   margin-left: 4px;

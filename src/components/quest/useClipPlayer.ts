@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import type { Clip } from "@/quests/types";
+import type { Clip, Visual } from "@/quests/types";
 
 export type PlayerStatus = "idle" | "playing" | "paused" | "ended";
 
@@ -234,16 +234,18 @@ export function useClipPlayer(baseUrl: string) {
 
 export type ClipPlayer = ReturnType<typeof useClipPlayer>;
 
-/** Какая картинка на экране в момент time внутри куска (по меткам времени или по тексту). */
-export function visualAt(clip: Clip, time: number, duration: number, fallback: string) {
+/**
+ * Что на экране в момент time внутри куска: картинка и сторона героя.
+ * Метки at — секунды от начала файла (из сценария); atText — пока меток нет, по доле текста.
+ */
+export function visualAt(clip: Clip, time: number, duration: number, fallback: string): Visual {
   const visuals = clip.visuals ?? [];
-  if (visuals.length === 0) return clip.image ?? fallback;
+  if (visuals.length === 0) return { image: clip.image ?? fallback };
   const text = clip.paragraphs.join("\n\n");
-  let current = visuals[0].image;
+  let current = visuals[0];
   for (const v of visuals) {
-    const at =
-      v.at ?? (v.atText ? (Math.max(0, text.indexOf(v.atText)) / text.length) * duration : 0);
-    if (time >= at) current = v.image;
+    const at = v.at ?? (v.atText ? (Math.max(0, text.indexOf(v.atText)) / text.length) * duration : 0);
+    if (time >= at) current = v;
   }
   return current;
 }

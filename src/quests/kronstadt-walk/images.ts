@@ -11,6 +11,8 @@ export type QuestImage = {
   hero: boolean;
   /** Показывать зеркально отражённой. */
   mirror: boolean;
+  /** На картинке надпись — отражать нельзя никогда. */
+  hasText: boolean;
   /** Можно открыть на весь экран (фото, схемы, иллюстрации, журнал) — не герои и не интерфейс. */
   zoomable: boolean;
 };
@@ -37,6 +39,7 @@ const images = new Map<string, QuestImage>(
       height: m.height,
       hero: m.kind === "hero",
       mirror: FACING_LEFT.has(m.id) && !HAS_TEXT.has(m.id),
+      hasText: HAS_TEXT.has(m.id),
       zoomable: m.kind === "flat" && !NOT_ZOOMABLE.has(m.id),
     },
   ]),

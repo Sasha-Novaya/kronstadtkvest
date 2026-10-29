@@ -404,13 +404,17 @@ function ListenScreen({
   const mine = player.clips[0]?.id === step.clips[0].id;
   const status = mine ? player.status : "idle";
   const clip: Clip = (mine && player.clip) || step.clips[0];
-  const imageId = visualAt(
+  const visual = visualAt(
     clip,
     mine ? player.clipTime : 0,
     mine ? player.clipDuration : 1,
     theme.heroes[clip.speaker]?.defaultImage ?? "F1",
   );
-  const image = questImage(imageId);
+  const image = questImage(visual.image);
+  // Герой справа смотрит влево, к центру: исходники героев смотрят вправо — отражаем
+  // (кроме картинок с надписями).
+  const right = image.hero && visual.side === "right";
+  const mirror = right ? !image.mirror && !image.hasText : image.mirror;
   // До первого нажатия длительность оцениваем по тексту — чтобы сразу было видно, сколько слушать.
   const total = mine ? player.total : step.clips.reduce((sum, c) => sum + estimate(c), 0);
 
@@ -431,7 +435,7 @@ function ListenScreen({
           <span>{landmark}</span>
         </p>
       )}
-      <div className={`${styles.stage} ${image.hero ? styles.stageLeft : ""}`}>
+      <div className={`${styles.stage} ${image.hero ? (right ? styles.stageRight : styles.stageLeft) : ""}`}>
         {image.zoomable ? (
           <button
             key={image.id}
@@ -451,7 +455,7 @@ function ListenScreen({
             width={image.width}
             height={image.height}
             alt=""
-            className={`${image.hero ? styles.stageHero : styles.stageIllustration} ${image.mirror ? styles.mirror : ""}`}
+            className={`${image.hero ? styles.stageHero : styles.stageIllustration} ${mirror ? styles.mirror : ""}`}
           />
         )}
       </div>
@@ -492,14 +496,16 @@ function ReadSheet({ clips, theme, onClose }: { clips: Clip[]; theme: QuestTheme
           </button>
         </div>
         <div className={styles.sheetBody}>
-          {clips.map((clip) => (
-            <section key={clip.id} className={styles.sheetClip} style={heroVariables(theme, clip.speaker)}>
-              <p className={styles.heroName}>{theme.heroes[clip.speaker]?.name}</p>
-              {clip.paragraphs.map((p) => (
-                <p key={p}>{p}</p>
-              ))}
-            </section>
-          ))}
+          {clips
+            .flatMap((clip) => clip.script ?? [{ speaker: clip.speaker, paragraphs: clip.paragraphs }])
+            .map((line, n) => (
+              <section key={n} className={styles.sheetClip} style={heroVariables(theme, line.speaker)}>
+                <p className={styles.heroName}>{theme.heroes[line.speaker]?.name}</p>
+                {line.paragraphs.map((p) => (
+                  <p key={p}>{p}</p>
+                ))}
+              </section>
+            ))}
         </div>
       </div>
     </div>
