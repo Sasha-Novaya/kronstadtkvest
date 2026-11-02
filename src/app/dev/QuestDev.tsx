@@ -11,6 +11,7 @@ export default function QuestDev({ startPart }: { startPart: number }) {
       theme={kronstadtWalkTheme}
       baseUrl="/quests/kronstadt-walk/"
       fontClass={hirroSans.variable}
+      progressKey="kronstadtkvest:progress:kronstadt-walk"
       devRestart
     />
   );

@@ -1,6 +1,6 @@
 "use client";
 
-import { Fragment, useState, type ReactNode } from "react";
+import { Fragment, useEffect, useRef, useState, type ReactNode } from "react";
 import type { QuestTheme } from "@/lib/theme";
 import { heroVariables, themeVariables } from "@/lib/theme";
 import { questImage } from "@/quests/kronstadt-walk/images";
@@ -21,6 +21,8 @@ import HeroLine from "./HeroLine";
 import Icon from "./Icon";
 import ImageViewer from "./ImageViewer";
 import { estimate, formatTime, useClipPlayer, visualAt, type ClipPlayer } from "./useClipPlayer";
+import { freshTask, mapAt, type Screen, type TaskState } from "@/lib/questProgress";
+import { useQuestProgress } from "./useQuestProgress";
 import styles from "./quest.module.css";
 
 type Props = {
@@ -35,66 +37,54 @@ type Props = {
   fontClass: string;
   /** Служебная кнопка «Начать заново» (только на /dev-страницах). */
   devRestart?: boolean;
+  /** Общая запись этого квеста для всех служебных точек входа. */
+  progressKey: string;
 };
-
-/** Экран квеста. Подсказка и «Есть страница!» — отдельные экраны своего шага. */
-type Screen =
-  | { kind: "step"; p: number; i: number }
-  | { kind: "hint"; p: number; i: number; n: number }
-  | { kind: "found"; p: number; i: number }
-  | { kind: "end" };
-
-/** Состояние задания: подсказки, неверные варианты, решено ли (номер ответа). */
-type TaskState = {
-  hints: number;
-  wrong: number[];
-  shake: number | null;
-  /** Сколько раз трясли поле ввода — чтобы анимация запускалась заново. */
-  shakes: number;
-  solved: number | null;
-  input: string;
-};
-
-const freshTask: TaskState = { hints: 0, wrong: [], shake: null, shakes: 0, solved: null, input: "" };
 
 /** Проверка введённого ответа (ТЗ станций): без пробелов по краям, без регистра, «ё» = «е». */
 const normalize = (s: string) => s.trim().toLowerCase().replaceAll("ё", "е");
 
 const MAP_HINT = "Нажмите на карту — откроется маршрут";
 
-export default function QuestRunner({ parts, startPart = 0, theme, baseUrl, fontClass, devRestart }: Props) {
-  const first: Screen = { kind: "step", p: startPart, i: 0 };
+export default function QuestRunner({ parts, startPart = 0, theme, baseUrl, fontClass, devRestart, progressKey }: Props) {
   const player = useClipPlayer(baseUrl);
-  // История экранов: «Назад» возвращает на предыдущий, прогресс при этом не сбрасывается.
-  const [history, setHistory] = useState<Screen[]>([first]);
-  const [tasks, setTasks] = useState<Record<string, TaskState>>({});
-  const [pages, setPages] = useState<number[]>([]);
-  // Имена экипажа для грамоты.
-  const [crew, setCrew] = useState<string[]>([""]);
-  // Подпись под мини-картой — только на первом экране с картой во всём квесте.
-  // Если квест начинается прямо с экрана с картой — подпись на нём.
-  const mapAt = (p: number, i: number) => {
-    const step = parts[p].steps[i];
-    return step.type === "walk" && step.point ? `${p}:${i}` : null;
-  };
-  const [firstMap, setFirstMap] = useState<string | null>(() => mapAt(startPart, 0));
-  // Картинка, открытая на весь экран (звук и экран под ней не трогаем).
+  const { progress, update, reset } = useQuestProgress(parts, startPart, progressKey);
   const [viewer, setViewer] = useState<ReactNode>(null);
+  const pending = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const cancelPending = () => {
+    if (pending.current !== null) clearTimeout(pending.current);
+    pending.current = null;
+  };
+  useEffect(() => () => {
+    if (pending.current !== null) clearTimeout(pending.current);
+  }, []);
 
+  // Не показываем начальный экран поверх сохранённого во время восстановления.
+  if (!progress) return <div className={`${styles.app} ${fontClass}`} style={themeVariables(theme)} />;
+  const { history, tasks, pages, crew, firstMap } = progress;
   const screen = history[history.length - 1];
   const key = (p: number, i: number) => `${p}:${i}`;
   const taskOf = (p: number, i: number) => tasks[key(p, i)] ?? freshTask;
   const setTask = (p: number, i: number, change: (t: TaskState) => TaskState) =>
-    setTasks((all) => ({ ...all, [key(p, i)]: change(all[key(p, i)] ?? freshTask) }));
+    update((all) => ({ ...all, tasks: { ...all.tasks, [key(p, i)]: change(all.tasks[key(p, i)] ?? freshTask) } }));
 
   const go = (next: Screen, keepAudio = false) => {
+    cancelPending();
     if (!keepAudio) player.stop();
-    if (next.kind === "step" && !firstMap) setFirstMap(mapAt(next.p, next.i));
-    setHistory((h) => [...h, next]);
+    update((all) => ({
+      ...all,
+      firstMap: all.firstMap ?? (next.kind === "step" ? mapAt(parts, next.p, next.i) : null),
+      history: [...all.history, next],
+    }));
   };
   const back = () => {
+    cancelPending();
     player.stop();
-    setHistory((h) => (h.length > 1 ? h.slice(0, -1) : h));
+    update((all) => ({ ...all, history: all.history.length > 1 ? all.history.slice(0, -1) : all.history }));
+  };
+  const showAnswerSoon = (p: number, i: number) => {
+    cancelPending();
+    pending.current = setTimeout(() => go({ kind: "found", p, i }, true), 900);
   };
   /** Следующий шаг: в этой части, иначе начало следующей части, иначе служебный конец. */
   const after = (p: number, i: number): Screen =>
@@ -105,12 +95,11 @@ export default function QuestRunner({ parts, startPart = 0, theme, baseUrl, font
         : { kind: "end" };
 
   const restart = () => {
+    if (!window.confirm("Начать заново? Имена экипажа и весь сохранённый прогресс этого квеста будут удалены.")) return;
+    cancelPending();
     player.stop();
-    setHistory([first]);
-    setTasks({});
-    setPages([]);
-    setCrew([""]);
-    setFirstMap(mapAt(startPart, 0));
+    setViewer(null);
+    reset();
   };
 
   const onBack = history.length > 1 ? back : undefined;
@@ -181,9 +170,13 @@ export default function QuestRunner({ parts, startPart = 0, theme, baseUrl, font
         // Звук после ответа запускаем прямо в нажатии — иначе iPhone его не включит.
         player.start([step.afterAnswer]);
         const page = step.givesPage;
-        if (page) setPages((all) => (all.includes(page) ? all : [...all, page]));
-        setTask(p, i, (t) => ({ ...t, solved: answer, shake: null, input }));
-        setTimeout(() => go({ kind: "found", p, i }, true), 900);
+        // Ответ и награда записываются вместе, ещё до отложенного перехода.
+        update((all) => ({
+          ...all,
+          pages: page && !all.pages.includes(page) ? [...all.pages, page] : all.pages,
+          tasks: { ...all.tasks, [key(p, i)]: { ...(all.tasks[key(p, i)] ?? freshTask), solved: answer, shake: null, input } },
+        }));
+        showAnswerSoon(p, i);
       };
       content = (
         <TaskScreen
@@ -204,8 +197,13 @@ export default function QuestRunner({ parts, startPart = 0, theme, baseUrl, font
           }}
           onHint={() => {
             const n = task.hints + 1;
-            setTask(p, i, (t) => ({ ...t, hints: n, shake: null }));
-            go({ kind: "hint", p, i, n });
+            player.stop();
+            cancelPending();
+            update((all) => ({
+              ...all,
+              tasks: { ...all.tasks, [key(p, i)]: { ...(all.tasks[key(p, i)] ?? freshTask), hints: n, shake: null } },
+              history: [...all.history, { kind: "hint", p, i, n }],
+            }));
           }}
           onReveal={() => (step.kind === "choice" ? solve(step.correct) : solve(0, step.accepted[0]))}
           onSolvedNext={() => go({ kind: "found", p, i })}
@@ -223,7 +221,7 @@ export default function QuestRunner({ parts, startPart = 0, theme, baseUrl, font
             if (vote.solved !== null) return;
             player.start([step.afterAnswer]);
             setTask(p, i, (t) => ({ ...t, solved: choice }));
-            setTimeout(() => go({ kind: "found", p, i }, true), 900);
+            showAnswerSoon(p, i);
           }}
           onSolvedNext={() => go({ kind: "found", p, i })}
         />
@@ -251,7 +249,7 @@ export default function QuestRunner({ parts, startPart = 0, theme, baseUrl, font
         />
       );
     } else if (step.type === "crew") {
-      content = <CrewScreen {...frame} step={step} crew={crew} onChange={setCrew} onZoom={zoomImage} onNext={next} />;
+      content = <CrewScreen {...frame} step={step} crew={crew} onChange={(crew) => update((all) => ({ ...all, crew }))} onZoom={zoomImage} onNext={next} />;
     } else if (step.type === "memo") {
       content = <MemoScreen {...frame} step={step} onNext={next} />;
     } else if (step.type === "journalPage") {
