@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import test from "node:test";
-import { clearProgress, freshTask, initialProgress, progressLayout, readProgress, writeProgress } from "../src/lib/questProgress.ts";
+import { audioScreen, clearProgress, freshTask, initialProgress, progressLayout, readProgress, writeProgress } from "../src/lib/questProgress.ts";
 
 const parts = ["start", "station-1", "station-2"].map((name) =>
   JSON.parse(readFileSync(new URL(`../src/quests/kronstadt-walk/content/${name}.json`, import.meta.url), "utf8")));
@@ -137,4 +137,30 @@ test("служебный конец тоже восстанавливается"
   progress.history.push({ kind: "end" });
   writeProgress(key, parts, progress, storage);
   assert.equal(readProgress(key, parts, storage).history.at(-1).kind, "end");
+});
+
+test("аудиоэкраны различаются внутри станции и сохраняются после возврата", () => {
+  const p = initialProgress(parts, 0);
+  const ids = parts.flatMap((part, index) => part.steps.flatMap((_, i) => {
+    const audio = audioScreen(parts, {kind: "step", p: index, i});
+    return audio ? [audio.id] : [];
+  }));
+  assert.equal(new Set(ids).size, ids.length);
+  assert.ok(ids.length > 3);
+  p.visitedAudio = ids;
+  const m = memory();
+  writeProgress(key, parts, p, m.storage);
+  assert.deepEqual(readProgress(key, parts, m.storage).visitedAudio, ids);
+  assert.deepEqual(initialProgress(parts, 0).visitedAudio, []);
+});
+
+test("старое сохранение восстанавливается без повторного запуска известных экранов", () => {
+  const m = memory();
+  const p = completed();
+  delete p.visitedAudio;
+  writeProgress(key, parts, p, m.storage);
+  const restored = readProgress(key, parts, m.storage);
+  assert.deepEqual(restored.crew, p.crew);
+  assert.deepEqual(restored.pages, p.pages);
+  assert.ok(restored.visitedAudio.includes(audioScreen(parts, {kind:"found",p:1,i:1}).id));
 });

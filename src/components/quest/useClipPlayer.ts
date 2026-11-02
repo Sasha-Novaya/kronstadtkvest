@@ -28,6 +28,8 @@ export function useClipPlayer(baseUrl: string) {
   const clipsRef = useRef<Clip[]>([]);
   const indexRef = useRef(0);
   const playingRef = useRef(false);
+  const request = useRef(0);
+  const pendingSeek = useRef<number | null>(null);
   // Если звукового файла нет (или он не загрузился) — «играем» по примерному времени,
   // чтобы полоса прогресса и смена картинок работали так же, как с файлом.
   const sim = useRef<{ on: boolean; t: number; timer: ReturnType<typeof setInterval> | null }>({
@@ -78,31 +80,58 @@ export function useClipPlayer(baseUrl: string) {
         if (!sim.current.on) setTime(el.currentTime);
       });
       el.addEventListener("error", () => {
+        if (!clipsRef.current.length) return;
         // Файла нет — продолжаем по примерному времени, если сейчас должно играть.
-        sim.current.t = 0;
+        sim.current.t = pendingSeek.current ?? 0;
+        pendingSeek.current = null;
         sim.current.on = true;
-        if (playingRef.current) runSim();
+        if (playingRef.current) { setStatus("playing"); runSim(); }
       });
       el.addEventListener("loadedmetadata", () => {
+        if (pendingSeek.current !== null) {
+          el.currentTime = Math.min(pendingSeek.current, Number.isFinite(el.duration) ? el.duration : pendingSeek.current);
+          setTime(el.currentTime);
+          pendingSeek.current = null;
+        }
         const clip = clipsRef.current[indexRef.current];
         if (clip && Number.isFinite(el.duration)) {
           setDurations((d) => ({ ...d, [clip.id]: el.duration }));
         }
       });
-      el.addEventListener("ended", () => advanceRef.current());
+      el.addEventListener("seeked", () => { if (!sim.current.on) setTime(el.currentTime); });
+      el.addEventListener("ended", () => { if (playingRef.current) advanceRef.current(); });
       audioRef.current = el;
     }
     return audioRef.current;
   }, [runSim]);
 
+  const attemptPlay = useCallback((el: HTMLAudioElement) => {
+    const id = ++request.current;
+    playingRef.current = true;
+    void el.play().then(() => {
+      if (id !== request.current) return;
+      setStatus("playing");
+      void keepAwake(true);
+    }).catch(() => {
+      if (id !== request.current || sim.current.on) return;
+      playingRef.current = false;
+      setStatus("paused");
+      void keepAwake(false);
+    });
+  }, [keepAwake]);
+
   const load = useCallback(
-    (el: HTMLAudioElement, clip: Clip, autoplay: boolean) => {
+    (el: HTMLAudioElement, clip: Clip, autoplay: boolean, offset = 0) => {
+      ++request.current;
+      el.pause();
+      pendingSeek.current = offset;
       stopSim();
       sim.current = { on: false, t: 0, timer: null };
       el.src = baseUrl + clip.file;
-      if (autoplay) el.play().catch(() => undefined);
+      el.load();
+      if (autoplay) attemptPlay(el);
     },
-    [baseUrl, stopSim],
+    [baseUrl, stopSim, attemptPlay],
   );
 
   useEffect(() => {
@@ -139,6 +168,8 @@ export function useClipPlayer(baseUrl: string) {
 
   useEffect(
     () => () => {
+      ++request.current;
+      playingRef.current = false;
       audioRef.current?.pause();
       stopSim();
       void keepAwake(false);
@@ -150,6 +181,7 @@ export function useClipPlayer(baseUrl: string) {
   const start = useCallback(
     (next: Clip[], autoplay = true) => {
       const el = audio();
+      if (!next.length) return;
       el.pause();
       clipsRef.current = next;
       indexRef.current = 0;
@@ -158,12 +190,8 @@ export function useClipPlayer(baseUrl: string) {
       setTime(0);
       playingRef.current = autoplay;
       load(el, next[0], autoplay);
-      if (autoplay) {
-        setStatus("playing");
-        void keepAwake(true);
-      } else {
-        setStatus("idle");
-      }
+      setStatus("idle");
+      if (!autoplay) void keepAwake(false);
     },
     [audio, load, keepAwake],
   );
@@ -177,11 +205,12 @@ export function useClipPlayer(baseUrl: string) {
     setStatus("playing");
     playingRef.current = true;
     if (sim.current.on) runSim();
-    else el.play().catch(() => undefined);
+    else attemptPlay(el);
     void keepAwake(true);
-  }, [audio, status, start, runSim, keepAwake]);
+  }, [audio, status, start, runSim, keepAwake, attemptPlay]);
 
   const pause = useCallback(() => {
+    ++request.current;
     audio().pause();
     stopSim();
     playingRef.current = false;
@@ -189,18 +218,44 @@ export function useClipPlayer(baseUrl: string) {
     void keepAwake(false);
   }, [audio, stopSim, keepAwake]);
 
-  const back10 = useCallback(() => {
-    if (sim.current.on) {
-      sim.current.t = Math.max(0, sim.current.t - 10);
-      setTime(sim.current.t);
-      return;
+  /** Абсолютная позиция внутри всего блока, включая границы отдельных файлов. */
+  const seek = useCallback((position: number) => {
+    const list = clipsRef.current;
+    if (!list.length || !Number.isFinite(position)) return;
+    const length = (clip: Clip) => durations[clip.id] ?? estimate(clip);
+    const total = list.reduce((sum, clip) => sum + length(clip), 0);
+    let remaining = Math.max(0, Math.min(position, total));
+    let target = 0;
+    while (target < list.length - 1 && remaining >= length(list[target])) {
+      remaining -= length(list[target++]);
     }
+    const wasPlaying = playingRef.current;
     const el = audio();
-    el.currentTime = Math.max(0, el.currentTime - 10);
-    setTime(el.currentTime);
-  }, [audio]);
+    if (target !== indexRef.current) {
+      indexRef.current = target;
+      setIndex(target);
+      load(el, list[target], wasPlaying, remaining);
+    } else if (sim.current.on) {
+      sim.current.t = remaining;
+    } else if (el.readyState >= 1) {
+      el.currentTime = remaining;
+    } else {
+      pendingSeek.current = remaining;
+    }
+    setTime(remaining);
+    if (!wasPlaying) setStatus("paused");
+  }, [audio, durations, load]);
+
+  const back10 = useCallback(() => {
+    const before = clipsRef.current.slice(0, indexRef.current)
+      .reduce((sum, clip) => sum + (durations[clip.id] ?? estimate(clip)), 0);
+    seek(before + (sim.current.on ? sim.current.t : pendingSeek.current ?? audio().currentTime) - 10);
+  }, [audio, durations, seek]);
 
   const stop = useCallback(() => {
+    ++request.current;
+    pendingSeek.current = null;
+    clipsRef.current = [];
     audioRef.current?.pause();
     stopSim();
     playingRef.current = false;
@@ -228,6 +283,7 @@ export function useClipPlayer(baseUrl: string) {
     play,
     pause,
     back10,
+    seek,
     stop,
   };
 }

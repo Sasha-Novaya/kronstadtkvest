@@ -1,6 +1,6 @@
 "use client";
 
-import { Fragment, useEffect, useRef, useState, type ReactNode } from "react";
+import { Fragment, useEffect, useRef, useState, type CSSProperties, type ReactNode } from "react";
 import type { QuestTheme } from "@/lib/theme";
 import { heroVariables, themeVariables } from "@/lib/theme";
 import { questImage } from "@/quests/kronstadt-walk/images";
@@ -21,7 +21,7 @@ import HeroLine from "./HeroLine";
 import Icon from "./Icon";
 import ImageViewer from "./ImageViewer";
 import { estimate, formatTime, useClipPlayer, visualAt, type ClipPlayer } from "./useClipPlayer";
-import { freshTask, mapAt, type Screen, type TaskState } from "@/lib/questProgress";
+import { audioScreen, freshTask, mapAt, type Screen, type TaskState } from "@/lib/questProgress";
 import { useQuestProgress } from "./useQuestProgress";
 import styles from "./quest.module.css";
 
@@ -59,6 +59,22 @@ export default function QuestRunner({ parts, startPart = 0, theme, baseUrl, font
     if (pending.current !== null) clearTimeout(pending.current);
   }, []);
 
+  const startAudio = player.start;
+  const preparedAudio = useRef<string | null>(null);
+  // Только начальное открытие/восстановление. Переходы кнопками готовят звук
+  // синхронно, пока браузер ещё видит действие пользователя.
+  useEffect(() => {
+    if (!progress) return;
+    const target = audioScreen(parts, progress.history[progress.history.length - 1]);
+    if (!target || preparedAudio.current === target.id) return;
+    preparedAudio.current = target.id;
+    const first = !progress.visitedAudio.includes(target.id);
+    startAudio(target.clips, first);
+    if (first) update((all) => ({
+      ...all, visitedAudio: [...new Set([...all.visitedAudio, target.id])],
+    }));
+  }, [progress, parts, startAudio, update]);
+
   // Не показываем начальный экран поверх сохранённого во время восстановления.
   if (!progress) return <div className={`${styles.app} ${fontClass}`} style={themeVariables(theme)} />;
   const { history, tasks, pages, crew, firstMap } = progress;
@@ -68,9 +84,22 @@ export default function QuestRunner({ parts, startPart = 0, theme, baseUrl, font
   const setTask = (p: number, i: number, change: (t: TaskState) => TaskState) =>
     update((all) => ({ ...all, tasks: { ...all.tasks, [key(p, i)]: change(all.tasks[key(p, i)] ?? freshTask) } }));
 
+  const prepareAudio = (next: Screen, allowAutoplay: boolean) => {
+    const target = audioScreen(parts, next);
+    preparedAudio.current = target?.id ?? null;
+    if (!target) return;
+    const first = !progress.visitedAudio.includes(target.id);
+    player.start(target.clips, allowAutoplay && first);
+    update((all) => ({
+      ...all, visitedAudio: [...new Set([...all.visitedAudio, target.id])],
+    }));
+  };
   const go = (next: Screen, keepAudio = false) => {
     cancelPending();
-    if (!keepAudio) player.stop();
+    if (!keepAudio) {
+      player.stop();
+      prepareAudio(next, true);
+    }
     update((all) => ({
       ...all,
       firstMap: all.firstMap ?? (next.kind === "step" ? mapAt(parts, next.p, next.i) : null),
@@ -80,6 +109,7 @@ export default function QuestRunner({ parts, startPart = 0, theme, baseUrl, font
   const back = () => {
     cancelPending();
     player.stop();
+    prepareAudio(history[Math.max(0, history.length - 2)], false);
     update((all) => ({ ...all, history: all.history.length > 1 ? all.history.slice(0, -1) : all.history }));
   };
   const showAnswerSoon = (p: number, i: number) => {
@@ -99,6 +129,7 @@ export default function QuestRunner({ parts, startPart = 0, theme, baseUrl, font
     cancelPending();
     player.stop();
     setViewer(null);
+    preparedAudio.current = null;
     reset();
   };
 
@@ -168,7 +199,7 @@ export default function QuestRunner({ parts, startPart = 0, theme, baseUrl, font
       const task = taskOf(p, i);
       const solve = (answer: number, input = task.input) => {
         // Звук после ответа запускаем прямо в нажатии — иначе iPhone его не включит.
-        player.start([step.afterAnswer]);
+        prepareAudio({ kind: "found", p, i }, true);
         const page = step.givesPage;
         // Ответ и награда записываются вместе, ещё до отложенного перехода.
         update((all) => ({
@@ -219,7 +250,7 @@ export default function QuestRunner({ parts, startPart = 0, theme, baseUrl, font
           chosen={vote.solved}
           onChoose={(choice) => {
             if (vote.solved !== null) return;
-            player.start([step.afterAnswer]);
+            prepareAudio({ kind: "found", p, i }, true);
             setTask(p, i, (t) => ({ ...t, solved: choice }));
             showAnswerSoon(p, i);
           }}
@@ -462,9 +493,7 @@ function ListenScreen({
         <button type="button" className={`${styles.button} ${styles.primary} ${styles.listen}`} onClick={main.action}>
           <Icon name={main.icon} size={26} /> {main.label}
         </button>
-        <div className={styles.track}>
-          <div className={styles.trackFill} style={{ width: total ? `${((mine ? player.elapsed : 0) / total) * 100}%` : "0%" }} />
-        </div>
+        <SeekBar player={player} clips={step.clips} />
         <div className={styles.time}>
           <span>{formatTime(mine ? player.elapsed : 0)}</span>
           {mine && status !== "idle" && (
@@ -512,18 +541,47 @@ function ReadSheet({ clips, theme, onClose }: { clips: Clip[]; theme: QuestTheme
 }
 
 /** Мини-плеер в карточке реплики (реплика после ответа играет сама; после «Назад» — по кнопке). */
+function SeekBar({ player, clips }: { player: ClipPlayer; clips: Clip[] }) {
+  const mine = player.clips[0]?.id === clips[0].id;
+  const total = mine ? player.total : clips.reduce((sum, c) => sum + estimate(c), 0);
+  const elapsed = mine ? Math.min(player.elapsed, total) : 0;
+  return (
+    <input
+      type="range"
+      className={styles.seek}
+      aria-label="Позиция аудиозаписи"
+      aria-valuetext={`${formatTime(elapsed)} из ${formatTime(total)}`}
+      min={0}
+      max={total || 1}
+      step={0.1}
+      value={elapsed}
+      style={{ "--played": `${total ? elapsed / total * 100 : 0}%` } as CSSProperties}
+      onChange={(event) => {
+        if (!mine) player.start(clips, false);
+        player.seek(Number(event.target.value));
+      }}
+    />
+  );
+}
+
+/** Реплики после ответов используют тот же плеер и ту же шкалу. */
 function MiniPlayer({ player, clips }: { player: ClipPlayer; clips: Clip[] }) {
   const mine = player.clips[0]?.id === clips[0].id;
   const playing = mine && player.status === "playing";
   const total = mine ? player.total : clips.reduce((sum, c) => sum + estimate(c), 0);
   const onClick = playing ? player.pause : mine ? player.play : () => player.start(clips);
   return (
-    <div className={styles.miniPlayer}>
-      <button type="button" className={styles.miniButton} onClick={onClick} aria-label={playing ? "Пауза" : "Слушать"}>
-        <Icon name={playing ? "pause" : "play"} size={24} />
-      </button>
-      <div className={styles.track}>
-        <div className={styles.trackFill} style={{ width: total ? `${((mine ? player.elapsed : 0) / total) * 100}%` : "0%" }} />
+    <div className={styles.miniAudio}>
+      <div className={styles.miniPlayer}>
+        <button type="button" className={styles.miniButton} onClick={onClick} aria-label={playing ? "Пауза" : "Слушать"}>
+          <Icon name={playing ? "pause" : player.status === "ended" && mine ? "replay" : "play"} size={24} />
+        </button>
+        <SeekBar player={player} clips={clips} />
+      </div>
+      <div className={styles.time}>
+        <span>{formatTime(mine ? player.elapsed : 0)}</span>
+        {mine && <button type="button" className={styles.back10} onClick={player.back10}><Icon name="back10" size={24} /> назад 10 с</button>}
+        <span>{formatTime(total)}</span>
       </div>
     </div>
   );

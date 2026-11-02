@@ -17,6 +17,7 @@ export type TaskState = {
 
 export type QuestProgress = {
   history: Screen[];
+  visitedAudio: string[];
   tasks: Record<string, TaskState>;
   pages: number[];
   crew: string[];
@@ -35,7 +36,7 @@ export function mapAt(parts: Part[], p: number, i: number): string | null {
 export function initialProgress(parts: Part[], startPart: number): QuestProgress {
   return {
     history: [{ kind: "step", p: startPart, i: 0 }],
-    tasks: {}, pages: [], crew: [""], firstMap: mapAt(parts, startPart, 0),
+    visitedAudio: [], tasks: {}, pages: [], crew: [""], firstMap: mapAt(parts, startPart, 0),
   };
 }
 
@@ -96,6 +97,15 @@ function validTask(v: unknown, step: Step): v is TaskState {
   return v.solved === 0 && step.accepted.some((a) => a.trim().toLowerCase().replaceAll("ё", "е") === input);
 }
 
+export function audioScreen(parts: Part[], screen: Screen) {
+  if (screen.kind === "end" || screen.kind === "hint") return null;
+  const step = parts[screen.p]?.steps[screen.i];
+  const clips = screen.kind === "found"
+    ? step && (step.type === "task" || step.type === "vote") ? [step.afterAnswer] : null
+    : step?.type === "audio" ? step.clips : null;
+  return clips?.length ? { id: `${parts[screen.p].id}:${screen.i}:${screen.kind}`, clips } : null;
+}
+
 function parseProgress(value: unknown, parts: Part[]): QuestProgress | null {
   if (!isObject(value) || !Array.isArray(value.history) || !value.history.length) return null;
   if (!value.history.every((s) => validScreen(s, parts))) return null;
@@ -122,7 +132,20 @@ function parseProgress(value: unknown, parts: Part[]): QuestProgress | null {
     if (screen.kind === "found" && tasks[`${screen.p}:${screen.i}`]?.solved == null) return null;
     if (screen.kind === "hint" && (tasks[`${screen.p}:${screen.i}`]?.hints ?? 0) < screen.n) return null;
   }
+  const knownAudio = new Set(parts.flatMap((part, p) => part.steps.flatMap((_, i) =>
+    (["step", "found"] as const).flatMap((kind) => {
+      const audio = audioScreen(parts, { kind, p, i });
+      return audio ? [audio.id] : [];
+    }))));
+  // Старые сохранения остаются совместимыми; известная история уже посещена.
+  const visitedAudio = Array.isArray(value.visitedAudio)
+    ? value.visitedAudio.filter((id): id is string => typeof id === "string" && knownAudio.has(id))
+    : (value.history as Screen[]).flatMap((screen) => {
+      const audio = audioScreen(parts, screen);
+      return audio ? [audio.id] : [];
+    });
   return {
+    visitedAudio: [...new Set(visitedAudio)],
     history: value.history as Screen[], tasks, pages: [...new Set(value.pages as number[])],
     crew: value.crew as string[], firstMap: value.firstMap as string | null,
   };

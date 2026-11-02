@@ -26,7 +26,7 @@ try {
  assert.deepEqual(await p.getByRole('textbox').evaluateAll(es=>es.map(e=>e.value)),['Саша','Миша']);
  console.log('OK: имена после обновления');
  await click(p,'Подняться на борт!');
- await click(p,'Слушать'); await click(p,'Пауза'); await click(p,'Продолжить'); await click(p,'назад 10 с');
+ await click(p,'Пауза'); await click(p,'Продолжить'); await click(p,'назад 10 с');
  await click(p,'Читать самим'); await visible(p,'Капитан Селёдочка!');
  await p.getByRole('dialog').getByRole('button',{name:'Закрыть'}).click();
  await click(p,'Далее'); await click(p,'Далее'); await click(p,'Всё понятно, поехали!'); await click(p,'Далее');
