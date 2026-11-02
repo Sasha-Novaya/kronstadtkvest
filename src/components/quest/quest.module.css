@@ -464,7 +464,7 @@
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 0 16px 14px;
+  padding: 0 16px;
 }
 
 .miniButton {
@@ -889,6 +889,7 @@
 .miniAudio { width: 100%; }
 
 .miniAudio > .time {
-  padding: 0 16px 10px;
+  margin-top: -12px;
+  padding: 0 16px 6px;
   gap: 8px;
 }
